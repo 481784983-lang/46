@@ -1,0 +1,14 @@
+:root {
+  --primary-color: #8b4513;
+  --background-color: #f5f2e8;
+  --text-color: #3a3a3a;
+  --border-color: #dcdcdc;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+body {
+  margin: 0;
+  font-family: 'Microsoft YaHei', 'SimSun', serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}

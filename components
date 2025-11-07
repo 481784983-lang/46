@@ -1,0 +1,8 @@
+<script>start("c:\\Users\\48178\\Downloads\\tavern_helper_template-main\\src\\新古风UI\\components\\");</script>
+<script>onHasParentDirectory();</script>
+<script>addRow("AttributeButton.vue","AttributeButton.vue",0,1663,"1.6 kB",1762476569,"2025/11/7 08:49:29");</script>
+<script>addRow("CharacterPanel.vue","CharacterPanel.vue",0,2524,"2.5 kB",1762476705,"2025/11/7 08:51:45");</script>
+<script>addRow("InventoryPanel.vue","InventoryPanel.vue",0,2009,"2.0 kB",1762476512,"2025/11/7 08:48:32");</script>
+<script>addRow("RelationshipsPanel.vue","RelationshipsPanel.vue",0,2149,"2.1 kB",1762476765,"2025/11/7 08:52:45");</script>
+<script>addRow("TianxiaPanel.vue","TianxiaPanel.vue",0,2231,"2.2 kB",1762476733,"2025/11/7 08:52:13");</script>
+<script>addRow("WorldInfo.vue","WorldInfo.vue",0,1488,"1.5 kB",1762476782,"2025/11/7 08:53:02");</script>
