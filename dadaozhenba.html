@@ -1,0 +1,1343 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+        /* ⬇️ 引入在线书法字体 (大字) 和 思源宋体 (小字)，保证所有手机端都能完美显示古风 ⬇️ */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Zhi+Mang+Xing&display=swap');
+
+        /* =========================================
+           [大乘期·领域展开] 天地法则变量 (羊皮纸古卷风格)
+        ========================================= */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        :root {
+            /* 基础色板重构 */
+            --paper-base: #f4ebd8;       /* 羊皮纸底色 */
+            --paper-panel: rgba(250, 245, 235, 0.85); /* 半透明羊皮纸面板 */
+            --text-ink: #3b2b20;         /* 浓墨（主文字色） */
+            --text-light: #7a6552;       /* 淡墨（次要文字/标签） */
+            --accent-red: #b82a2a;       /* 朱砂红（醒目高光/按键） */
+            --accent-gold: #c29227;      /* 复古暗金（次高光/边框） */
+            --border-gold: rgba(194, 146, 39, 0.4); /* 暗金残边 */
+            --jade-ghost: #405c54;       /* 幽冥青（保留作特殊高光） */
+            
+            /* ⬇️ 字体法则重构 ⬇️ */
+            /* 大字体（标题/名字/强调）：优先加载狂草，霸气外露 */
+            --f-art: 'Zhi Mang Xing', 'STXingkai', '华文行楷', cursive;
+            
+            /* 小字体（正文/描述/属性/输入框）：优先加载思源宋体，端正清秀，解决安卓手机退回默认黑体的问题 */
+            --f-body: 'Noto Serif SC', 'STKaiti', '楷体', 'SimSun', serif;
+            /* ⬆️ 字体法则重构 ⬆️ */
+            
+            /* 噪点透明度降低，在浅色底上形成纸张纹理 */
+            --noise-texture: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+        }
+
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-gold); border-radius: 0; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-red); }
+
+        body { 
+            margin: 0; padding: 0; 
+            background-color: var(--paper-base); 
+            font-family: var(--f-body); color: var(--text-ink); 
+            cursor: crosshair; 
+            overflow-x: hidden; overflow-y: auto; 
+            min-height: 100vh;
+        }
+        
+        /* =========================================
+           [大荒场景] 噪点、血月与阵纹
+        ========================================= */
+        #ui-stage {
+            position: relative; width: 100vw; min-height: 100vh; 
+            background: var(--paper-base);
+            z-index: 0; display: flex; align-items: center; justify-content: center;
+        }
+        #ui-stage::before { 
+            content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -3;
+            background-image: var(--noise-texture);
+        }
+        #ui-stage::after {
+            content: ""; position: fixed; top: -15%; right: -10%;
+            width: 70vw; height: 70vw; border-radius: 50%;
+            /* 晕染效果改为朱砂墨晕 */
+            background: radial-gradient(circle, rgba(184, 42, 42, 0.08) 0%, rgba(244, 235, 216, 0) 70%);
+            filter: blur(60px); z-index: -2; pointer-events: none;
+            animation: moonPulse 8s ease-in-out infinite alternate;
+        }
+        
+        .diagonal-lines {
+            position: fixed; inset: 0; z-index: -1; pointer-events: none;
+            background: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(194, 146, 39, 0.06) 40px, rgba(194, 146, 39, 0.06) 41px);
+        }
+
+        @keyframes moonPulse { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(1.1); opacity: 1; } }
+
+        /* =========================================
+           [天道轮回阵 - 开场]
+        ========================================= */
+        .intro { 
+            position: fixed; inset: 0; background: var(--paper-base); z-index: 999; 
+            display: flex; align-items: center; justify-content: center; overflow: hidden; 
+            transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1), transform 1.5s ease;
+        }
+        .intro.out { opacity: 0; pointer-events: none; transform: scale(1.1); filter: blur(10px); }
+        
+        .taiji-box { position: absolute; width: 200px; height: 200px; z-index: 10; animation: floatVoid 6s ease-in-out infinite; }
+        .taiji { 
+            width: 100%; height: 100%; border-radius: 50%; 
+            background: conic-gradient(from 0deg, transparent 0%, var(--accent-red) 50%, transparent 100%);
+            border: 2px dashed var(--accent-gold);
+            box-shadow: 0 0 50px rgba(184, 42, 42, 0.3), inset 0 0 20px rgba(194, 146, 39, 0.3);
+            animation: spinFast 8s linear infinite; position: relative; 
+            background-color: var(--paper-base);
+        }
+        .taiji::before { 
+            content: ''; position: absolute; inset: 15px; border-radius: 50%; 
+            border: 1px solid var(--border-gold); animation: spinReverse 12s linear infinite;
+        }
+        .taiji::after {
+            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 40px; height: 40px; background: var(--paper-base); border-radius: 50%;
+            box-shadow: 0 0 20px var(--accent-red);
+        }
+
+        .float-quote { 
+            position: absolute; font-family: var(--f-art); font-size: 2.2em; 
+            background: linear-gradient(to bottom, var(--text-ink), var(--accent-red));
+            -webkit-background-clip: text; color: transparent;
+            letter-spacing: 6px; opacity: 0; white-space: nowrap; z-index: 5; pointer-events: none; 
+            text-shadow: 0 0 20px rgba(184, 42, 42, 0.2);
+            animation: cinematicFade 3.5s cubic-bezier(0.2, 0, 0.2, 1) forwards; 
+        }
+        
+        @keyframes cinematicFade {
+            0% { opacity: 0; transform: translateY(40px) scale(0.9); filter: blur(15px); }
+            30% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+            70% { opacity: 1; transform: translateY(-10px) scale(1.05); filter: blur(0); }
+            100% { opacity: 0; transform: translateY(-30px) scale(1.1); filter: blur(15px); }
+        }
+        @keyframes spinFast { to { transform: rotate(360deg); } }
+        @keyframes spinReverse { to { transform: rotate(-360deg); } }
+        @keyframes floatVoid { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+        /* =========================================
+           [主界面布局] 
+        ========================================= */
+        /* =========================================
+   [主界面布局] 
+========================================= */
+.main { 
+    display: flex; opacity: 0; transform: scale(0.95); filter: blur(10px);
+    transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1); 
+    width: 90vw; max-width: 1300px; 
+    height: 85vh; 
+    min-height: 650px; /* 👈 新增：保底高度。防止 GitHub 预览/iframe 把 vh 算得极小 */
+    margin: 40px auto; position: relative; z-index: 1; gap: 30px;
+}
+        .main.show { opacity: 1; transform: scale(1); filter: blur(0); }
+        
+        /* [左侧栏] */
+        .left { 
+            width: 30%; background: var(--paper-panel); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid var(--accent-red); border-left: 1px solid var(--border-gold);
+            box-shadow: 15px 20px 40px rgba(90, 70, 40, 0.15); /* 阴影变亮变暖 */
+            clip-path: polygon(0 0, 100% 0, 100% 95%, 90% 100%, 0 100%);
+            padding: 40px 20px; display: flex; flex-direction: column; align-items: center; overflow-y: auto; 
+            position: relative; z-index: 2; transition: all 0.5s ease;
+        }
+
+        .avatar-w { width: 120px; height: 120px; position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 25px; flex-shrink: 0; }
+        .avatar { 
+            width: 100%; height: 100%; transform: rotate(45deg);
+            background: rgba(255,255,255,0.7); border: 1px solid var(--accent-red); 
+            display: flex; justify-content: center; align-items: center; 
+            font-family: var(--f-art); font-size: 3.5em; color: var(--accent-red); 
+            z-index: 2; box-shadow: inset 0 0 20px rgba(184, 42, 42, 0.1); transition: 0.6s; overflow: hidden;
+        }
+        .avatar span { transform: rotate(-45deg); display: block; text-shadow: 0 0 10px rgba(184,42,42,0.3); }
+        
+        .aura { position: absolute; inset: -15px; border-radius: 50%; z-index: 1; opacity: 0; transition: 1s; border: 2px dashed transparent; }
+        .aura.on { animation: spinFast 10s infinite linear; }
+        
+        .gold .aura { border-color: var(--accent-gold); opacity: 0.6; box-shadow: 0 0 30px rgba(194, 146, 39, 0.2); } .gold .avatar { color: var(--accent-gold); border-color: var(--accent-gold); }
+        .red .aura { border-color: var(--accent-red); opacity: 0.6; box-shadow: 0 0 30px rgba(184, 42, 42, 0.3); } .red .avatar { color: var(--accent-red); }
+        .purple .aura { border-color: var(--jade-ghost); opacity: 0.6; box-shadow: 0 0 30px rgba(64, 92, 84, 0.3); } .purple .avatar { color: var(--jade-ghost); border-color: var(--jade-ghost); }
+
+        .name { font-family: var(--f-art); font-size: 3.5em; color: var(--accent-red); margin: 0 0 5px 0; text-align: center; letter-spacing: 8px; text-shadow: 2px 2px 4px rgba(184, 42, 42, 0.2); font-weight: bold; }
+        .race-tag { font-size: 0.8em; background: rgba(184, 42, 42, 0.08); border: 1px solid var(--accent-red); color: var(--accent-red); padding: 2px 15px; margin-bottom: 30px; letter-spacing: 4px; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%); }
+        
+        
+        
+        .stats { width: 100%; border-top: 1px solid var(--border-gold); border-bottom: 1px solid var(--border-gold); padding: 15px 0; font-size: 0.85em; }
+        .row { display: flex; justify-content: space-between; padding: 10px 15px; border-bottom: 1px dashed rgba(194, 146, 39, 0.2); color: var(--text-light); }
+        .row:last-child { border: 0; } 
+        .val { color: var(--accent-red); font-weight: bold; letter-spacing: 1px; }
+        
+        .desc { margin-top: 25px; font-size: 0.9em; color: var(--text-ink); line-height: 2; text-align: justify; width: 100%; padding: 20px; background: rgba(255,255,255,0.4); border-left: 2px solid var(--accent-red); box-sizing: border-box; }
+
+        /* [右侧栏] */
+        .right { 
+            flex: 1; padding: 40px 50px; background: var(--paper-panel); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--accent-red); border-right: 1px solid var(--border-gold);
+            clip-path: polygon(0 5%, 100% 0, 100% 100%, 5% 100%);
+            box-shadow: 15px 20px 40px rgba(90, 70, 40, 0.15);
+            overflow-y: auto; scroll-behavior: smooth; position: relative; z-index: 1;
+        }
+        
+        .step-nav { display: flex; justify-content: space-between; margin-bottom: 40px; position: relative; padding-bottom: 15px; }
+        .step-nav::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 1px; background: linear-gradient(90deg, transparent, var(--accent-red), transparent); opacity: 0.3; }
+        .step-dot { flex: 1; text-align: center; font-family: var(--f-art); color: var(--text-light); font-size: 1.4em; transition: 0.4s; cursor: pointer; letter-spacing: 3px; }
+        .step-dot.active { color: var(--accent-red); transform: scale(1.05); font-weight: bold; }
+        
+        .step-content { display: none; animation: slideUpReveal 0.6s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
+        .step-content.active { display: block; }
+        @keyframes slideUpReveal { from { opacity: 0; transform: translateY(20px) skewY(1deg); } to { opacity: 1; transform: translateY(0) skewY(0); } }
+
+
+        
+        .sec-h { font-family: var(--f-art); font-size: 2.2em; color: var(--accent-red); margin: 0 0 30px 0; position: relative; padding-left: 25px; display: flex; align-items: center; letter-spacing: 4px; font-weight: bold; border-bottom: 2px solid rgba(184, 42, 42, 0.1); padding-bottom: 15px;}
+        .sec-h::before { content: '✦'; position: absolute; left: 0; color: var(--accent-gold); font-size: 0.9em; animation: moonPulse 2s infinite alternate; }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .field { position: relative; }
+        .lbl { display: block; font-size: 0.8em; color: var(--text-light); margin-bottom: 10px; letter-spacing: 2px; font-weight: bold; }
+        .grp { display: flex; gap: 10px; align-items: center; }
+        
+        /* 羊皮纸风格的输入框 */
+        .inp, .sel, .txt { 
+            width: 100%; background: rgba(255,255,255,0.6); border: 1px solid var(--border-gold); 
+            padding: 14px 16px; font-family: var(--f-body); font-size: 1em; color: var(--text-ink); 
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); box-sizing: border-box; 
+            clip-path: polygon(0 0, 98% 0, 100% 15%, 100% 100%, 2% 100%, 0 85%);
+        }
+        .inp:focus, .sel:focus, .txt:focus { 
+            border-color: var(--accent-red); outline: none; background: #fff;
+            box-shadow: 0 0 15px rgba(184, 42, 42, 0.1); transform: translateX(2px); 
+        }
+        .sel { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%23b82a2a'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; padding-right: 35px; }
+        .sel option { background: var(--paper-base); color: var(--text-ink); }
+        
+        .btn-edit { width: 42px; height: 42px; border: 1px solid var(--border-gold); background: rgba(255,255,255,0.5); color: var(--text-light); cursor: pointer; transition: 0.3s; font-family: var(--f-body); clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%); }
+        .btn-edit:hover { color: var(--accent-red); border-color: var(--accent-red); background: rgba(184,42,42,0.05); }
+        .btn-edit.on { background: var(--accent-red); color: #fff; border-color: var(--accent-red); }
+        .txt { height: 100px; resize: none; line-height: 1.8; clip-path: polygon(0 0, 99% 0, 100% 5%, 100% 100%, 1% 100%, 0 95%); }
+
+        /* ⬇️ 新版羁绊专属排版：已修复 Flexbox 文字竖排 Bug ⬇️ */
+        .comp-list { display: block; width: 100%; max-height: 400px; overflow-y: auto; overflow-x: hidden; padding-right: 5px; box-sizing: border-box; }
+        .comp-item { display: flex; flex-wrap: wrap; align-items: flex-start; width: 100%; box-sizing: border-box; padding: 15px; margin-bottom: 12px; border: 1px solid var(--border-gold); cursor: pointer; transition: all 0.3s ease; background: rgba(255,255,255,0.4); border-radius: 4px; }
+        .comp-item:hover { background: rgba(255,255,255,0.9); border-color: var(--accent-red); }
+        .comp-item.active { background: #fff; border: 1px solid var(--accent-red); box-shadow: 0 5px 15px rgba(184,42,42,0.15); transform: scale(1.02); z-index: 2; position: relative; }
+        
+        .comp-rank { flex: 0 0 auto; font-size: 0.85em; font-family: var(--f-body); color: var(--text-light); padding: 2px 6px; border: 1px solid var(--border-gold); border-radius: 3px; margin-right: 15px; margin-top: 2px; }
+        .comp-item.active .comp-rank { color: var(--accent-red); border-color: var(--accent-red); background: rgba(184,42,42,0.05); }
+        
+        /* 核心修复：防止内容坍塌挤成竖排，且支持正常中文换行 */
+        .comp-info { flex: 1 1 auto; min-width: 150px; width: calc(100% - 80px); display: flex; flex-direction: column; }
+        .comp-name { font-weight: bold; font-size: 1.1em; color: var(--accent-red); letter-spacing: 1px; margin-bottom: 5px; white-space: normal; word-break: break-word; }
+        .comp-desc { font-size: 0.85em; color: var(--text-ink); line-height: 1.6; white-space: normal; word-break: break-word; }
+        
+        .rel-bar { display: none; width: 100%; flex-wrap: wrap; gap: 8px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-gold); }
+        .comp-item.active .rel-bar { display: flex; }
+        .rel-btn { flex: 1 1 calc(25% - 8px); min-width: 60px; font-size: 0.85em; padding: 8px 4px; text-align: center; border: 1px solid var(--border-gold); border-radius: 3px; cursor: pointer; color: var(--text-light); background: rgba(255,255,255,0.6); transition: all 0.2s; box-sizing: border-box; }
+        .rel-btn:hover { color: var(--accent-red); border-color: var(--accent-red); background: rgba(184,42,42,0.05); }
+        .rel-btn.active { background: var(--accent-red); color: #fff; border-color: var(--accent-red); box-shadow: 0 0 10px rgba(184,42,42,0.2); font-weight: bold; }
+        /* ⬆️ 新版羁绊专属排版 ⬆️ */     
+        
+        .foot { margin-top: 50px; padding-top: 30px; border-top: 1px solid var(--border-gold); display: flex; gap: 20px; }
+        .btn { flex: 1; padding: 15px; border: 0; font-family: var(--f-art); font-size: 1.4em; letter-spacing: 4px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); position: relative; overflow: hidden; }
+        
+        .btn-rnd { background: rgba(255,255,255,0.5); border: 1px solid var(--accent-gold); color: var(--accent-red); clip-path: polygon(0 0, 95% 0, 100% 100%, 5% 100%); }
+        .btn-rnd:hover { background: var(--accent-gold); color: #fff; transform: scale(1.02); }
+        
+        .btn-go { flex: 2; background: var(--accent-red); color: #fff; font-weight: bold; clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%); box-shadow: 0 5px 15px rgba(184, 42, 42, 0.2); }
+        .btn-go:hover { background: #961d1d; transform: translate(-2px, -2px) skewX(-2deg); box-shadow: 10px 10px 25px rgba(184, 42, 42, 0.4); }
+        .hidden { display: none !important; }
+
+        /* ========================================= */
+        /* 📱 [手机端专属适配] */
+        /* ========================================= */
+        @media (max-width: 768px) {
+            * { box-sizing: border-box !important; } 
+            
+            .float-quote { font-size: 1.4em; white-space: normal; left: 5% !important; width: 90%; text-align: center; }
+            
+            #ui-stage { align-items: flex-start; overflow-x: hidden; }
+            .main { 
+        display: block; width: 100%; margin: 0; padding: 0; transform: none !important; 
+        height: auto;       /* 👈 新增：极其关键！覆盖电脑端的 85vh，让内容自然撑开高度 */
+        min-height: 100vh;  /* 👈 新增：保证手机端哪怕没内容，也至少占满一整屏 */
+    }
+            /* 核心修复：绝对定位的微调，拉开距离不遮挡 */
+            .left { 
+                width: 100%; border: none; border-bottom: 2px solid var(--accent-red); 
+                padding: 20px 15px 15px 15px; display: block; 
+                background: rgba(244, 235, 216, 0.95); z-index: 10;
+                position: sticky; top: 0; box-shadow: 0 5px 15px rgba(90,70,40,0.1);
+            }
+            .avatar-w { width: 75px; height: 75px; position: absolute; left: 20px; top: 25px; margin: 0; }
+            .avatar { font-size: 1.8em; border-width: 2px; }
+            .aura { inset: -6px; border-width: 1px; }
+            
+            .name { font-size: 2em; position: absolute; left: 115px; top: 25px; margin: 0; text-align: left; }
+            .race-tag { position: absolute; left: 115px; top: 65px; margin: 0; padding: 2px 10px; }
+            
+            .stats { margin-top: 95px; width: 100%; padding: 10px 5px 0 5px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px dashed var(--border-gold); }
+            .row { padding: 0; border: none; font-size: 0.8em; }
+            .desc { display: none; }
+            
+            .right { 
+                width: 100%; display: block; padding: 20px 15px 80px 15px; 
+                clip-path: none; border: none; height: auto; overflow: visible;
+                background: var(--paper-base);
+            }
+            
+            .sec-h { font-size: 1.3em; margin-bottom: 20px; flex-wrap: wrap; width: 100%; }
+            .sec-h span { white-space: nowrap; flex-shrink: 0; }
+            
+            .step-nav { margin-bottom: 25px; padding-bottom: 10px; width: 100%; }
+            .step-dot { font-size: 1.1em; letter-spacing: 1px; }
+            .grid { gap: 20px; display: flex; flex-direction: column; width: 100%; }
+            
+            .foot { flex-direction: column; gap: 15px; margin-top: 30px; padding-top: 25px; width: 100%; }
+            .btn { font-size: 1.2em; padding: 12px; clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%); width: 100%; }
+            .btn-go { clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%); }
+        }
+        /* =========================================
+           [大乘期·神识探查弹窗]
+        ========================================= */
+        .sys-modal { position: fixed; inset: 0; background: rgba(50, 30, 10, 0.7); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); z-index: 2000; display: flex; justify-content: center; align-items: center; }
+        .sys-modal-content { width: 90vw; max-width: 600px; background: var(--paper-base); border: 2px solid var(--accent-red); box-shadow: 0 20px 50px rgba(90, 70, 40, 0.5); clip-path: polygon(0 2%, 100% 0, 100% 98%, 0 100%); display: flex; flex-direction: column; }
+        .sys-modal-header { padding: 20px; border-bottom: 1px dashed var(--border-gold); display: flex; justify-content: space-between; align-items: center; }
+        .sys-modal-title { font-family: var(--f-art); color: var(--accent-red); font-size: 1.5em; letter-spacing: 2px; font-weight: bold; }
+        .sys-modal-close { color: var(--accent-gold); font-size: 1.5em; cursor: pointer; transition: 0.3s; font-family: var(--f-body); }
+        .sys-modal-close:hover { color: var(--accent-red); transform: scale(1.1); }
+        .sys-modal-body { padding: 20px; overflow-y: auto; max-height: 60vh; display: flex; flex-direction: column; gap: 15px; }
+        .custom-sel { text-align: left; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='%23b82a2a'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") !important; background-repeat: no-repeat !important; background-position: right 15px center !important; }
+        .custom-sel:hover { background-color: rgba(184, 42, 42, 0.05); }
+        /* =========================================
+           [羁绊品阶] T1至T9/EX 华丽度渐进式边框
+        ========================================= */
+        /* T1-T2: 凡尘/底层 - 朴素残卷 */
+        .comp-item[data-tier="T1"], .comp-item[data-tier="T2"] {
+            border: 1px solid var(--border-gold);
+            background: rgba(250, 245, 235, 0.4);
+        }
+        /* T3-T5: 中坚力量 - 暗金加粗，微微泛红 */
+        .comp-item[data-tier="T3"], .comp-item[data-tier="T4"], .comp-item[data-tier="T5"] {
+            border: 2px solid var(--accent-gold);
+            background: linear-gradient(135deg, rgba(250, 245, 235, 0.8), rgba(194, 146, 39, 0.1));
+            box-shadow: 2px 2px 8px rgba(194, 146, 39, 0.2);
+        }
+        /* T6-T7: 一方霸主 - 朱砂红为主，带法宝光晕 */
+        .comp-item[data-tier="T6"], .comp-item[data-tier="T7"] {
+            border: 2px solid var(--accent-red);
+            background: linear-gradient(135deg, rgba(250, 245, 235, 0.9), rgba(184, 42, 42, 0.08));
+            box-shadow: 0 4px 15px rgba(184, 42, 42, 0.2);
+            border-image: linear-gradient(45deg, var(--accent-red), var(--accent-gold)) 1;
+        }
+        .comp-item[data-tier="T6"] .comp-name, .comp-item[data-tier="T7"] .comp-name { font-size: 1.25em; }
+
+        /* T8-T9-EX: 绝巅/传说 - 极致华丽，金光/血光呼吸阵法特效 */
+        .comp-item[data-tier="T8"], .comp-item[data-tier="T9"], .comp-item[data-tier="EX"] {
+            border: 2px solid transparent;
+            background: linear-gradient(var(--paper-panel), var(--paper-panel)) padding-box,
+                        linear-gradient(45deg, var(--accent-red), #ffd700, var(--accent-red)) border-box;
+            box-shadow: 0 0 20px rgba(184, 42, 42, 0.4), inset 0 0 10px rgba(194, 146, 39, 0.2);
+            animation: breathGlow 3s infinite alternate;
+        }
+        .comp-item[data-tier="T8"] .comp-name, .comp-item[data-tier="T9"] .comp-name, .comp-item[data-tier="EX"] .comp-name {
+            font-size: 1.4em; text-shadow: 0 0 5px rgba(184, 42, 42, 0.5); font-weight: 900; letter-spacing: 2px;
+        }
+        .comp-item[data-tier="T8"] .comp-rank, .comp-item[data-tier="T9"] .comp-rank, .comp-item[data-tier="EX"] .comp-rank {
+            background: var(--accent-red); color: white; border-color: var(--accent-red); font-weight: bold;
+        }
+        @keyframes breathGlow {
+            from { box-shadow: 0 0 10px rgba(184, 42, 42, 0.3), inset 0 0 10px rgba(194, 146, 39, 0.1); }
+            to { box-shadow: 0 0 25px rgba(184, 42, 42, 0.7), inset 0 0 20px rgba(194, 146, 39, 0.5); }
+        }
+        
+    </style>
+</head>
+<body>
+    <div id="sys_modal" class="sys-modal hidden">
+            <div class="sys-modal-content">
+                <div class="sys-modal-header">
+                    <div class="sys-modal-title" id="sys_modal_title">选择法则</div>
+                    <div class="sys-modal-close" onclick="window.CloseOpt()">✖</div>
+                </div>
+                <div class="sys-modal-body comp-list" id="sys_modal_list">
+                    </div>
+            </div>
+        </div>
+    <div id="ui-stage">
+        <div class="diagonal-lines"></div>
+        <div class="intro" id="intro">
+            <div class="taiji-box"><div class="taiji"></div></div>
+        </div>
+        <div class="main" id="ui-main">
+            <div class="left">
+                <div class="avatar-w" id="p_aw"><div class="aura"></div><div class="avatar"><span id="p_av">道</span></div></div>
+                <div class="name" id="p_nm">无名</div>
+                <div class="race-tag" id="p_rd">人族 · 16岁</div>
+                <div class="stats">
+                    <div class="row"><span class="k">先天池</span><span class="val" id="p_rt">-</span></div>
+                    <div class="row"><span class="k">肉身淬</span><span class="val" id="p_bd">-</span></div>
+                    <div class="row"><span class="k">当前境</span><span class="val" id="p_cl">-</span></div>
+                    <div class="row"><span class="k">降生地</span><span class="val" id="p_lc">-</span></div>
+                </div>
+                <div class="desc" id="p_ds"></div>
+            </div>
+            <div class="right" id="cp_root">
+                <div class="step-nav">
+                    <div class="step-dot active" id="nav1">第一境·塑体</div>
+                    <div class="step-dot" id="nav2">第二境·铸魂</div>
+                    <div class="step-dot" id="nav3">第三境·点灵</div>
+                </div>
+
+                <div id="step1" class="step-content active">
+                    <div class="sec-h"><span>壹 · 真名与本源</span></div>
+                    <div class="grid">
+                        <div class="field"><span class="lbl">尊姓大名</span><input type="text" id="i_nm" class="inp" value="叶凡"></div>
+                        <div class="field"><span class="lbl">血脉种族</span><div class="grp"><div class="sel custom-sel" id="disp_i_rc" onclick="window.OpenSysModal('i_rc', '选择血脉种族')">人族</div>
+<input type="hidden" id="i_rc" value="人族"></div></div>
+                    </div>
+                    <div class="grid" style="margin-top:25px">
+                        <div class="field"><span class="lbl">阴阳化相</span><div class="grp"><div class="sel custom-sel" id="disp_i_gd" onclick="window.OpenSysModal('i_gd', '选择阴阳化相')">男修</div>
+<input type="hidden" id="i_gd" value="男修"></div></div>
+                        <div class="field"><span class="lbl">骨龄几何</span><div class="slider-w" style="display:flex;align-items:center;gap:15px;"><input type="range" id="i_ag" style="flex:1;accent-color:var(--decay-gold)" min="0" max="1000" value="16"><span class="val" id="v_ag" style="width:40px;text-align:right">16</span></div></div>
+                    </div>
+              <div class="foot">
+                        <button class="btn btn-rnd" onclick="window.RN()" style="flex:1.2;">天道狂卷</button>
+                        <button class="btn btn-go" onclick="window.navStep(2)" style="flex:2;">凝练本源，踏入下境</button>
+                    </div>    
+                </div>
+
+                <div id="step2" class="step-content hidden">
+                    <div class="sec-h"><span>贰 · 根骨与天命</span></div>
+                    <div class="grid">
+                        <div class="field"><span class="lbl" id="l_rt">灵根天赋</span><div class="grp"><div class="sel custom-sel" id="disp_i_rt" onclick="window.OpenSysModal('i_rt', '重塑灵根')">请选择</div><input type="hidden" id="i_rt"><button class="btn-edit" data-t="i_rt">改</button><input type="text" id="i_rt_c" class="inp hidden" placeholder="逆天改命..."></div></div>
+                        <div class="field"><span class="lbl">先天体质</span><div class="grp"><div class="sel custom-sel" id="disp_i_bd" onclick="window.OpenSysModal('i_bd', '凝练体质')">请选择</div><input type="hidden" id="i_bd"><button class="btn-edit" data-t="i_bd">改</button><input type="text" id="i_bd_c" class="inp hidden" placeholder="逆天改命..."></div></div>
+                    </div>
+                    <div class="grid" style="margin-top:25px">
+                        <div class="field"><span class="lbl">当前修为</span><div class="grp"><div class="sel custom-sel" id="disp_i_cl" onclick="window.OpenSysModal('i_cl', '选择当前修为')">凡人</div>
+<input type="hidden" id="i_cl" value="凡人"></div></div>
+                        <div class="field"><span class="lbl">天命气运</span><div class="grp"><div class="sel custom-sel" id="disp_i_lk" onclick="window.OpenSysModal('i_lk', '勘破天命')">请选择</div><input type="hidden" id="i_lk"><button class="btn-edit" data-t="i_lk">改</button><input type="text" id="i_lk_c" class="inp hidden" placeholder="逆天改命..."></div></div>
+                    </div>
+                    
+                    <div class="sec-h" style="margin-top:40px; justify-content: space-between; padding-right: 10px;">
+                        <span>叁 · 宿命羁绊</span>
+                        <div class="sel custom-sel" id="disp_i_comp_rc" style="width: auto; padding: 5px 30px 5px 15px; height: 32px; font-size: 0.7em; margin: 0; display: inline-block;" onclick="window.OpenSysModal('i_comp_rc', '选择NPC种族')">人族</div>
+<input type="hidden" id="i_comp_rc" value="人族">
+                    </div>
+                    <div id="comp_root" class="comp-list"></div>
+                    
+                    <div class="foot">
+                        <button class="btn btn-rnd" onclick="window.navStep(1)" style="flex:1;">重塑</button>
+                        <button class="btn btn-rnd" onclick="window.RN()" style="flex:1.2;">天道狂卷</button>
+                        <button class="btn btn-go" onclick="window.navStep(3)" style="flex:2;">勘破宿命</button>
+                    </div>
+                </div>
+
+                <div id="step3" class="step-content hidden">
+                    <div class="sec-h"><span>肆 · 入世机缘</span></div>
+                    <div class="grid">
+                        <div class="field"><span class="lbl">伴生法宝</span><div class="grp"><div class="sel custom-sel" id="disp_i_it" onclick="window.OpenSysModal('i_it', '选择伴生法宝')">请选择</div><input type="hidden" id="i_it"><button class="btn-edit" data-t="i_it">改</button><input type="text" id="i_it_c" class="inp hidden" placeholder="逆天改命..."></div></div>
+                        <div class="field"><span class="lbl">降生之地</span><div class="grp"><div class="sel custom-sel" id="disp_i_lc" onclick="window.OpenSysModal('i_lc', '逆转降生地')">请选择</div><input type="hidden" id="i_lc"><button class="btn-edit" data-t="i_lc">改</button><input type="text" id="i_lc_c" class="inp hidden" placeholder="逆天改命..."></div></div>
+                    </div>
+                    <div class="field" style="margin-top:25px"><span class="lbl">前尘往事</span><textarea id="i_ds" class="txt"></textarea></div>
+                    <div class="foot">
+                        <button class="btn btn-rnd" onclick="window.navStep(2)" style="flex:1;">逆转</button>
+                        <button class="btn btn-rnd" id="b_rng" onclick="window.RN()" style="flex:1.2;">天道狂卷</button>
+                        <button class="btn btn-go" id="b_go" onclick="window.SB()" style="flex:2.5;">以此身入世</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+ <script>
+(function() {
+    try {
+        // 【核心修复 1】显式声明全局羁绊变量，解决严格模式报错
+        let curComp = null;
+        let curRel = null;
+
+        // 【完整数据字典】一字不落，直接使用，无需再手动粘贴！
+        const DB = {
+            "Global": {
+                "Luck": [
+                    {n:"灰名·炮灰", v:"gray", d:"喝水塞牙，开局被余波震死的路人甲。"},
+                    {n:"灰名·早夭", v:"gray", d:"命如纸薄，活不过弱冠之年的天弃之子。"},
+                    {n:"灰名·天谴", v:"gray", d:"出门必踩雷，走路平地摔，天道看你极度不爽。"},
+                    {n:"灰名·破财", v:"gray", d:"穷神附体，碰到任何机缘都会变成废铜烂铁。"},
+                    {n:"灰名·替死", v:"gray", d:"天生替罪羊体质，别人惹祸你背锅，被雷劈的总是你。"},
+                    {n:"白名·凡骨", v:"white", d:"普普通通，在凡俗界安稳一生的命格。"},
+                    {n:"白名·安康", v:"white", d:"无灾无难，也无大富大贵，最平庸但也最幸福。"},
+                    {n:"白名·劳碌", v:"white", d:"终生奔波，勉强温饱，属于修真界底层打工人。"},
+                    {n:"绿名·精英", v:"green", d:"小有天赋，在大虞皇朝能混个一官半职，富甲一方。"},
+                    {n:"绿名·偏财", v:"green", d:"总能捡到些低阶灵石或残破法宝，勉强饿不死。"},
+                    {n:"绿名·福星", v:"green", d:"傻人有傻福，总能在危机中莫名其妙地苟活下来。"},
+                    {n:"绿名·逢春", v:"green", d:"大难不死必有后福，虽然经常受伤但恢复极快。"},
+                    {n:"绿名·贵人", v:"green", d:"资质平庸，但总能遇到愿意随手提携你的前辈。"},
+                    {n:"蓝名·英杰", v:"blue", d:"一方豪杰，有希望能拜入万法阁内门，筑基有望。"},
+                    {n:"蓝名·探花", v:"blue", d:"才华横溢但总屈居人下，永远的万年老二。"},
+                    {n:"蓝名·奇遇", v:"blue", d:"跳崖不死，偶尔能误入前辈洞府捞点功法。"},
+                    {n:"蓝名·武骨", v:"blue", d:"战斗直觉惊人，在生死搏杀中总能突破极限。"},
+                    {n:"蓝名·旺夫/妻", v:"blue", d:"自己气运一般，但能极大提升道侣的修炼速度。"},
+                    {n:"蓝名·破局", v:"blue", d:"擅长在绝境中找到生机，命很硬。"},
+                    {n:"紫名·天骄", v:"purple", d:"机缘深厚，昆仑道宫争抢的真传种子，未来可期。"},
+                    {n:"紫名·气运化蟒", v:"purple", d:"头顶气运凝结成蟒，受皇朝龙气庇护，诸邪辟易。"},
+                    {n:"紫名·天机庇佑", v:"purple", d:"天机阁的重点关注对象，逢凶化吉，算无遗策。"},
+                    {n:"紫名·多宝", v:"purple", d:"走到哪都能引起天地灵物共鸣，出门散步都能踢到法宝。"},
+                    {n:"紫名·破妄", v:"purple", d:"天生能看破一切阵法与幻境，捡漏王。"},
+                    {n:"紫名·天心", v:"purple", d:"修炼没有瓶颈，只要灵气足够就能一直突破。"},
+                    {n:"紫名·万妖迷", v:"purple", d:"不仅受人族欢迎，妖兽见你也觉得格外顺眼，不忍伤害。"},
+                    {n:"橙名·传说", v:"orange", d:"万古无一，镇压时代，有望冲击大乘境，留名青史。"},
+                    {n:"橙名·气运化龙", v:"orange", d:"气运金龙盘绕，天命加身，言出法随的雏形。"},
+                    {n:"橙名·气运掠夺", v:"orange", d:"能将被你击败之人的气运据为己有，越战越强。"},
+                    {n:"橙名·大日", v:"orange", d:"如烈阳横空，光明磊落，一切阴谋诡计在你面前都会土崩瓦解。"},
+                    {n:"橙名·涅槃", v:"orange", d:"每次死亡都会以更强的姿态复活，但痛觉也是翻倍的。"},
+                    {n:"红名·逆天", v:"red", d:"天道所妒，九死一生，每次渡劫都是死局，但战力爆表。"},
+                    {n:"红名·血光", v:"red", d:"走到哪死到哪，柯南体质，周围人全死光你还能活。"},
+                    {n:"红名·绝恋", v:"red", d:"情路极其坎坷，爱谁谁死，最终只能杀妻/夫证道。"},
+                    {n:"红名·修罗", v:"red", d:"只有在杀戮中才能感受到平静，以万物为血食。"},
+                    {n:"红名·天怒", v:"red", d:"出生时天降血雨，被整个天道视为毒瘤，雷劫当饭吃。"},
+                    {n:"黑名·魔星", v:"black", d:"天煞孤星，克父克母克队友，独断万古，举世皆敌。"},
+                    {n:"黑名·万劫", v:"black", d:"每过十年必有一场生死大劫，渡不过即神魂俱灭。"},
+                    {n:"黑名·灾变", v:"black", d:"你的存在本身就会引发自然灾害，走到哪都是地震海啸。"},
+                    {n:"黑名·欺天", v:"black", d:"天机图中没有你的命星，你是一个不该存在的变数。"},
+                    {n:"黑名·灭世", v:"black", d:"命运的终点指向毁灭世界，所有人都在试图提前抹杀你。"},
+                    {n:"金名·主角", v:"gold", d:"天道私生子，跳崖捡神器，言出法随，位面之子。"},
+                    {n:"金名·重生", v:"gold", d:"保留着前世仙帝的记忆与功法，今生只为弥补遗憾。"},
+                    {n:"金名·穿越", v:"gold", d:"带着现代人的记忆和神秘系统降临，降维打击修真界。"},
+                    {n:"粉色·桃花", v:"pink", d:"桃花泛滥，红颜/蓝颜祸水不断，不是在修罗场就是在去修罗场的路上。"},
+                    {n:"粉色·媚骨", v:"pink", d:"看你一眼就会产生执念，引发无数强者的争夺战。"},
+                    {n:"青色·长生", v:"cyan", d:"苟道至尊，只要我不死就能熬死所有人，存在感极低。"},
+                    {n:"无色·遁去的一", v:"cyan", d:"大衍之数五十，其用四十有九。你就是那遁去的一，不受任何法则约束。"}
+                ],
+"Rel": {
+    "L": "关系羁绊",
+    "R": [
+        /* --- 陌路·泛泛之交 --- */
+        {n:"路人", v:"stranger", d:"萍水相逢，擦肩一瞥，天地之大，再无交集。"},
+        {n:"过客", v:"passerby", d:"在驿站共饮过一壶粗茶，聊过几句闲天，仅此而已。"},
+        {n:"同门", v:"fellow_disciple", d:"师出同门，朝朝碰面，却连对方洞府在哪个山头都不清楚。"},
+        {n:"邻居", v:"neighbor", d:"洞府一墙之隔，偶尔借个火，点头之交。"},
+        {n:"笔友", v:"penpal", d:"传音符往来多年，纸上交心，见面却未必相识。"},
+        {n:"师叔祖", v:"elder", d:"宗门里辈分极高却从未说过话的长辈，只在大典上远远见过。"},
+
+        /* --- 利益·往来交易 --- */
+        {n:"交易客", v:"trader", d:"坊市有过灵石往来，认钱不认人，钱货两清便无瓜葛。"},
+        {n:"雇主", v:"employer", d:"你拿钱办事，任务期间命暂归他，结束便两不相欠。"},
+        {n:"金主", v:"sponsor", d:"有人觉得你有潜质，每隔一段时日便送来灵石丹药，不求回报。"},
+        {n:"大客户", v:"client", d:"出手阔绰的常客，你的丹药法器有一半被他包了。"},
+        {n:"投资人", v:"investor", d:"在你微末时押注于你，等你一飞冲天，他要十倍回报。"},
+        {n:"情报贩子", v:"informant", d:"一手交灵石一手交秘密，彼此心知肚明，这交情薄如纸。"},
+
+        /* --- 同道·并肩而行 --- */
+        {n:"同袍", v:"comrade", d:"战场上背靠背杀敌，一起分过干粮，一起扛过生死。"},
+        {n:"搭档", v:"partner_in_arms", d:"配合默契的战友，一攻一防，缺了谁战力都减半。"},
+        {n:"引路人", v:"guide", d:"在你最迷茫时指过一条路，你至今不知他为何帮你。"},
+        {n:"师兄", v:"senior_brother", d:"修为高你一筹，替你挡过事也骂过你，嘴上嫌弃心里护着。"},
+        {n:"师姐", v:"senior_sister", d:"待你如亲弟，教你运气行功，你闯祸她叹气，但会帮你兜底。"},
+        {n:"师弟", v:"junior_brother", d:"跟在你身后叫师兄，把你当榜样，你受伤他比谁都急。"},
+        {n:"师妹", v:"junior_sister", d:"宗门里最黏你的小师妹，淘气又麻烦，但满眼都是崇拜。"},
+
+        /* --- 挚友·知己情谊 --- */
+        {n:"知音", v:"confidant", d:"琴瑟相和，诗酒相酬，你们懂彼此的孤傲与软肋。"},
+        {n:"青梅", v:"childhood_friend", d:"两小无猜，一起翻墙偷果泥里打滚，是你最干净的回忆。"},
+        {n:"兄长", v:"sworn_brother", d:"没有任何血缘，却歃血为盟，他不是亲兄，胜似亲兄。"},
+        {n:"死党", v:"best_friend", d:"一起蹲过禁闭，一起挨过戒律鞭，你的黑历史他全有备份。"},
+        {n:"酒友", v:"drinking_buddy", d:"每个月圆之夜对饮，不谈修为，只骂天道不公，喝完各自离去。"},
+        {n:"救命交情", v:"life_saver", d:"你救过他的命，他这一辈子都在找机会报答。"},
+
+        /* --- 亲密·情缘红线 --- */
+        {n:"暗恋", v:"crush", d:"远远看你便心跳如鼓，目光追着你跑，却始终不敢开口。"},
+        {n:"明恋", v:"open_crush", d:"公开宣布要追求你，手段荒唐，追求方式闹得满城风雨。"},
+        {n:"落花有意", v:"unrequited", d:"他对你一往情深，满心满眼皆是你，可惜你心里没有他。"},
+        {n:"流水无情", v:"heartless", d:"你已将真心剖与他看，他却冷冷转身，未曾多看一眼。"},
+        {n:"红颜知己", v:"confidante", d:"知你心头最深的疤，你对她无话不谈，却从未越过那条线。"},
+        {n:"道侣", v:"partner", d:"灵魂共鸣的半身，生死契阔，命脉相连，此生只此一人。"},
+        {n:"联姻", v:"marriage", d:"家族利益的砝码，大典盛极一时，洞房里却冷得像坟。"},
+        {n:"退婚", v:"broken_engagement", d:"一纸退婚书送到你面前，他携宗门长老同来，要你识趣。"},
+        {n:"错付", v:"wrong_love", d:"你燃尽一切去爱，到头来发现他从未将你放进过心里。"},
+
+        /* --- 恩怨·对立阵营 --- */
+        {n:"竞争者", v:"competitor", d:"宗门大比交过手，彼此暗暗较劲，见了面眼红脖子粗。"},
+        {n:"宿敌", v:"enemy", d:"大道之争不死不休，你们是彼此最恨的人，也最了解彼此。"},
+        {n:"苦主", v:"victim", d:"你抢了他的机缘或道侣，杀意刻骨，见面无需言语，唯有死斗。"},
+        {n:"背叛者", v:"betrayer", d:"你最信任时他在背后捅了一刀，比仇人更可恨。"},
+        {n:"债主", v:"debtor", d:"你欠他的灵石能堆成山，他追你到天涯海角，比仇人还执着。"},
+        {n:"替罪羊", v:"scapegoat", d:"一个黑锅从天而降，全天下都以为是你干的，他替你背了。"},
+        {n:"杀父之仇", v:"vendetta", d:"你或你的家族灭他满门，他隐姓埋名，只等取你性命的那天。"},
+        /* --- 血亲·家族羁绊 --- */
+        {n:"母亲", v:"mother", d:"十月怀胎，血浓于水。纵你修至大乘、威震大荒，在她眼中依旧是那个需要护佑的孩儿。"},
+        {n:"养母", v:"adoptive_mother", d:"生恩不及养恩大。虽无半点血缘，却在风雪微末中将你捡回抚育，此恩重于泰山。"},
+        {n:"姨娘", v:"concubine", d:"深宅大院里的长辈，人前对你笑脸相迎嘘寒问暖，背地里却常为了家族灵石与资源的分配暗流涌动。"},
+        {n:"姐姐", v:"older_sister", d:"长姐如母。从小替你顶包挨罚，把最好的灵药都偷偷留给你，是你冰冷仙途上最温柔的牵挂。"},
+        {n:"妹妹", v:"younger_sister", d:"昔日跟在你身后拉着衣角的娇怯少女，是你在这吃人的修真界里发誓要用命去守护的逆鳞。"},
+        {n:"嫂子", v:"sister_in_law", d:"兄长之妻，待你亲厚有加。若兄长外出历练或遭逢不测，她便是咬牙撑起这一脉门庭的坚韧脊梁。"},
+        {n:"婶婶", v:"aunt", d:"叔伯正妻。家族聚会时总爱盘问你的修为进展与道侣之事，言语间透着些精明市侩，却也是难得的凡俗烟火气。"},
+
+        /* --- 依附·从属羁绊 --- */
+        {n:"师徒", v:"master", d:"传道授业，燃尽自己照亮前路，他给你通天本领，你也承他一世因果。"},
+        {n:"首徒", v:"first_disciple", d:"师父的第一个徒弟，被寄予厚望，同门皆以你为首。"},
+        {n:"记名弟子", v:"nominal_disciple", d:"只挂了个名，师父没教过你什么，这师徒名分薄如窗户纸。"},
+        {n:"护道者", v:"guardian", d:"宗门或家族派来藏在暗处的强者，为你遮风挡雨，不求你知晓。"},
+        {n:"追随者", v:"follower", d:"被你的实力或气度折服，甘愿追随左右，你指哪他打哪。"},
+        {n:"主仆", v:"servant", d:"签了最高灵魂契约，你一念定他生死，他的命是你的，尊严也是。"},
+        {n:"家臣", v:"retainer", d:"世代侍奉你家族的死士，他出生就是为了替你挡刀赴死。"},
+
+        /* --- 禁锢·身不由己 --- */
+        {n:"棋子", v:"puppet", d:"你以为的自由是假象，每一步都在他算计之中，待你成熟便收割。"},
+        {n:"鼎炉", v:"cauldron", d:"被圈养的采补工具，修为不是你的，命也不是你的，唯独痛苦是。"},
+        {n:"俘虏", v:"captive", d:"战败被擒，关在暗无天日的牢狱，你在等一个永远不会来的赎金。"},
+        {n:"囚徒", v:"prisoner", d:"被镇压在绝地的囚犯，日复一日被阵法消磨修为，永无出头之日。"},
+        {n:"实验体", v:"experiment", d:"你被绑在冰冷石台上，每天有不同的丹药与术法在你身上尝试。"}
+        
+    ]
+}
+            },
+            "人族": {
+                L:"灵根天赋",
+                R:["五行废灵根 (五行俱全无一精纯 灵气入体如筛漏)","四属性伪灵根 (四系斑驳互相掣肘 注定杂役终老)","驳杂无属性灵根 (灵气入体便自行溃散 修仙无望)","隐性朽木灵根 (灵根如朽木内里中空 稍运功法便碎)","漏风沙灵根 (灵气如沙从经脉缝隙漏光 修炼白费)","天生绝脉无灵根 (经脉全堵丹田如铁 仙路大门焊死)","注水水灵根 (勉强引动一丝水灵气 杯水车薪)","枯死木灵根 (木灵将熄仅存余烬 比废材稍强分毫)","残缺火灵根 (火灵碎裂仅剩星火 炼丹烧火勉强能用)","沉星暗灵根 (灵根被暗星压制 完全无法吸取灵气)","石化土灵根 (灵根半化石 运功三天吸得一丝地气)","排斥一切的凡根 (经脉自行排异灵气 堪称修仙绝缘体)","三属性真灵根 (三系共存尚可修行 属中人之姿)","金水相生双灵根 (金生水气循环不息 斗法持久力强)","木火炼丹双灵根 (木助火势控火精妙 天生炼丹胚子)","水土双灵根 (土克水却又能相济 根基扎实防御强)","金火相克双灵根(金火互冲经脉剧痛 随时可能自爆)","冰水双灵根 (水凝为冰相性极合 修炼冰法事半功倍)","风木双灵根 (风催木长轻灵迅捷 擅长遁术与缠斗) ","阴阳平衡双灵根(阴阳二气调和共生 罕见而悟道极快)","雷火狂暴双灵根(雷火交加脾气暴躁 出手便是杀招)","地脉土灵根(身连地脉厚重沉稳 防御强耐力第一)","厚土金灵根(土生金气锋芒暗藏 攻守兼备之相)","青木水灵根(水生木气生机绵长 恢复力远超同阶)","变异雷灵根 (雷法代天行罚 杀伐之力冠绝同辈)","变异冰灵根 (冰封万里至寒 昆仑圣地抢着要)","变异风灵根 (来去如风缥缈无踪 逃命追杀第一流)","变异暗灵根 (融于暗影杀机无形 刺客宗门心头肉)","变异毒灵根 (万毒不侵御毒伤敌 毒道修行一日千里)","变异火灵根 (火焰亲和至极 炼丹炼器事半功倍)","变异血灵根 (嗜血狂暴战力飙升 但极易堕入魔道)","变异光灵根 (身化圣光净化邪祟 光系术法威力倍增)","星辰异灵根 (引动周天星辰之力 术法浩瀚如银河落)","空间异灵根 (参悟虚空挪移穿梭 万里疆域一步间)","时间异灵根 (触碰光阴长河之力 万载难遇传说级)","剑道异灵根 (天生剑心通明 剑气自生万剑臣服)","极品庚金天灵根 (锐金之气凝为实质 锋芒可断山河)","极品离火天灵根 (离火精粹焚尽八荒 火中称尊)","极品癸水天灵根 (癸水之精至阴至纯 一滴可化汪洋)","极品乙木天灵根 (乙木生机生生不息 一念万物回春)","极品戊土天灵根 (戊土厚重承载万物 立于大地即不败)","九阳天灵根 (九阳齐现至刚至猛 邪祟魔修见之即焚)","玄阴天灵根 (玄阴之气至柔至寒 冻结神魂不费吹灰)","纯粹剑灵根 (天生剑骨剑意天成 为剑而生人形仙剑)","万物生灵根 (亲和万灵催生草木 行走生机之源泉)","毁灭天灵根 (毁灭法则伴身 出手便是大破灭灾劫)","五行混沌灵根 (五行俱全混元如一 全系功法皆可修)","阴阳造化灵根 (阴阳互济演化万物 修炼一日千里)","吞噬灵根 (强夺他人灵力道基 霸道无匹逆天而行)","无字天书灵根 (心有所悟灵根自显 上限全靠想象)","大道鸿蒙灵根 (鸿蒙初辟本源之气 天生近道直指大罗)","不朽轮回灵根 (轮回烙印不灭 一世身死灵根再醒)","天妒残缺灵根 (强到天道不容 修为暴涨但寿元大减)","九死涅槃灵根 (每死一次浴火重生 根基更深一层)","天道私生子专属灵根 (气运加身天材地宝送上门 修炼如喝水)"],
+                B:["一介凡躯 (无灵根无天赋 肉体凡胎 修仙界最底层)","天生神力 (未修仙便具千斤之力 兵家将种好苗子)","铜皮铁骨 (筋骨天生坚韧 凡兵难伤 比凡人耐揍)","病弱之躯 (气血两亏寿数有损 药不能停 随时可能挂)","瞎眼/跛脚/残缺体 (肉身先天残缺 但往往心境更坚)","百毒不侵(凡毒) (凡间百毒视若饮水 行走江湖小神技)","过目不忘之体 (任何功法看一遍即记牢 悟性点满)","天生阴阳眼 (视鬼魂见阴煞 常被脏东西缠上)","天生炉鼎体 (体内真元极易被采补 行走的修为大补丸)","天生药罐子 (经脉纤细脆弱 需常年灵药吊命续行)","手无缚鸡之力书生体 (肉身羸弱不堪 搬块灵石都费劲)","先天五行道体 (天生亲和五行灵力 修行五行功法一日千里)","离火之躯 (火灵之气充盈百脉 控火如同呼吸)","玄冰玉体 (肌肤若冰玉寒气自生 修炼冰法事半功倍)","苍木灵体 (生机浓郁亲和草木 回春疗伤术威力倍增)","厚土战体 (脚踩大地气力不竭 防御惊人耐力无穷)","庚金剑体 (体内金气锋芒自生 掌中无剑亦可斩铁)","风雷双生体 (风雷二气交织共生 速度与爆发力并重)","太阴之体 (至阴之力潜藏于身 对月华之力亲和极高)","太阳之体 (至阳之火焚尽阴邪 大日真火傍身)","星光淬炼体 (引星辉淬炼肉身 越战越强体魄无双)","雷劫不灭体 (天生对雷劫有抗性 挨雷劈反能变强)","净水无垢体 (周身无垢尘不染 水质术法威力大增)","暗夜潜行体 (暗夜中气息全消 融于黑暗天然刺客)","剑心通明 (剑心澄澈纤尘不染 悟剑极快 昆仑剑修圣体)","荒古圣体 (气血如龙肉身无敌 荒古年间圣体遗脉 战皇殿专属)","苍天霸体 (霸气侧漏镇压同阶 肉身硬撼法宝 战皇殿霸道体质)","万药灵体 (辨识万药亲和草木 炼丹火候掌控入微 万法阁奇才专属)","阵道通明体 (阵纹脉络一目了然 推演阵法如有神助 阵法天骄)","玲珑剑骨 (天生剑骨通透 全身骨骼皆为剑形 为剑而生)","丹心琉璃体 (心若琉璃纯净无垢 炼丹时杂念不生 宗师苗子)","修罗杀体 (杀意凝实战意滔天 于杀戮中绽放 战场修罗)","天妖人王体 (人族血脉融合天妖之力 肉身强横妖力滔天)","千幻无相体 (容貌气质随心而变 千变万化难以窥破真身)","聚灵宝体 (周身自成漩涡 无时无刻不在吸纳游离灵气)","先天道胎 (天生近道悟性超凡 道韵自生 修行无瓶颈)","乘黄体 (寿元香气引万灵觊觎 行走的长生大药)","混沌神体 (混沌之气藏于身 万法不侵前途无量 大帝之姿)","万劫不灭金身 (历经万劫肉身不朽 皮糙肉厚堪比人形法宝)","无漏真仙体 (先天无漏不漏真元 体内藏有一缕仙家气息)","九转涅槃体 (每死一次涅槃重生 九转之后立地成仙)","大荒囚天体 (潜力无穷但遭天锁 需无数资源冲破封锁)","时空神体 (血液流淌时空道纹 能干涉小范围时空流速)","命运虚无体 (命运长河中不留痕迹 占卜推演对其无效)","太上忘情体 (修行一日千里 但七情渐消 渐入太上之境)","吞天魔体 (可吞噬他人修为本源 霸道至极 被正道围剿)","言出法随圣体 (一言既出 天地法则为之共鸣 口含天宪)","九阴绝脉 (阴脉郁结寒气攻心 若无逆天造化 难活过二十岁)","天谴厄难毒体 (周身剧毒不受控制 克亲克友 悲惨一生)","散财漏气金身 (吸纳灵气自动逸散 有多少灵石都不够填)","吸引天雷的避雷针体质 (渡劫时天雷格外关照 雷劫威力翻倍)","仇恨吸引体 (自带嘲讽光环 走到哪都有人想踩你一脚)"],
+                P:["大虞京城·贫民窟烂尾楼","大虞皇宫·冷宫深处","青竹村·村口老槐树下","大虞天牢·死囚牢房","繁华青楼·后院柴房","边关军营·死人堆里","京城首富府邸·绣楼","科举考场·三号号房","大虞菜市口·法场行刑台","凡人武馆·演武场","昆仑道宫·外门杂役处","昆仑主峰·悟道崖","昆仑禁地·万剑冢","昆仑思过崖·寒冰洞","昆仑剑池·洗剑石旁","万法阁·废丹垃圾场","万法阁·藏经阁顶层","万法阁·灵药园灵土里","万法阁·核心炼丹房","万法阁·傀儡流水线","战皇殿·血煞瀑布","战皇殿·斗兽场中央","战皇殿·重力石室","战皇殿·祖师先贤林","战皇殿·炼骨熔炉","合欢宗·红粉销魂窟","合欢宗·阴阳合欢殿","合欢宗·外门炉鼎房","玉女宗·冰清寒玉池","玉女宗·清修忘情崖","玉女宗·月下霓裳阁","西域佛门·菩提树下","西域佛门·大雷音寺废墟","西域佛门·舍利塔林","天机阁·地下拍卖会","天机阁·绝密卷宗室","天机阁·占星台","天机阁·黑市杀手营","天机阁·分舵算命摊","远古战场·万骨坑","葬仙谷·迷雾边缘","神秘大能的须弥戒指里","深山老林·猎户陷阱中","东海海底·水晶废墟","雷泽禁地·焦土之上","十万大山·边缘小镇","空间裂缝·虚空乱流中","古老传送阵的废墟上","不知名的小型秘境","九层妖塔·第一层","一口干涸的千年古井底","悬崖半腰的神秘山洞","一座被屠戮殆尽的死城","棺材里 (刚刚诈尸)"],
+                I:["一把生锈的铁剑","祖传的杀猪刀","半个破碗","一根打狗棒","一封退婚书","一块泛黄的手帕","一枚铜钱","一本《母猪的产后护理》(凡人书籍)","一双磨破的草鞋","一罐劣质跌打酒","神秘的黑色缺口戒指","神秘小绿瓶","半块染血的麒麟玉佩","半卷《道经》残页","烧焦的古老阵图","一颗不知名的兽蛋","长满铜锈的青铜小鼎","一把没有剑刃的剑柄","记载着宝藏坐标的羊皮纸","一截枯死的灵木","昆仑制式飞剑 (外门版)","万法阁初级炼丹炉","战皇殿的精铁指虎","大虞皇朝通关文牒","天机阁贵宾金卡","一打火球符","下品储物袋 (只有一立方米)","一瓶辟谷丹","防身用的护心镜","可以代步的纸鹤","斩仙飞刀 (残缺)","玲珑宝塔 (一层)","太极图 (高仿版)","打神鞭 (木制)","山河社稷图 (只能看地图)","十二品业火红莲 (一颗莲子)","诛仙阵图 (缺少四剑)","昊天镜 (镜面碎裂)","招妖幡 (只能招蚊子)","东皇钟 (敲不响)","一台可以联网的现代手机 (没电了)","一把AK47 (没有子弹)","一口极其沉重的黑锅 (可背可砸)","一枚复活币","一颗滑稽抱枕"],
+                D:["一袭白衣胜雪，剑眉星目，宛如昆仑谪仙，令人自惭形秽。","容颜绝世，气质清冷如月，眼底仿佛藏着万古星河。","眉心生有一朵妖冶的红莲印记，三分邪魅，七分霸气。","五官宛若上天最完美的杰作，嘴角总是挂着温润如玉的微笑。","身姿高挑，金发及腰，双眸如灿烂的烈日，让人不敢直视。","天生异瞳，左眼如冰，右眼如火，俊美中带着危险的气息。","相貌平平无奇，丢在人堆里绝对找不出来，标准的‘路人甲’脸。","皮肤黝黑，身材干瘦，看起来就像个常年劳作的农夫。","五官还算端正，但脸上长了几颗雀斑，笑起来有些憨厚。","有些婴儿肥，双眼大而无神，整天一副没睡醒的呆滞模样。","身材微胖，总是乐呵呵的，像个和气生财的市井商人。","头发花白，满脸皱纹，看起来已是行将就木的老者。","衣衫褴褛，蓬头垢面，但那一双眼睛却如恶狼般狠戾，透着凶光。","虎背熊腰，满脸横肉，身上布满了刀疤，一看就不好惹。","左臂空空如也，脸上有一道从眉骨贯穿到下巴的狰狞剑痕。","赤裸着上半身，肌肉虬结，皮肤上刻满了诡异的蛮荒阵纹。","穿着染血的破烂盔甲，头发被干涸的鲜血凝结在一起，杀气腾腾。","眼神空洞，浑身散发着死气，仿佛刚从地狱爬出来的恶鬼。","面白如纸，没有一丝血色，总是捂着嘴咳嗽，像是病入膏肓。","身材极其矮小，犹如五岁孩童，但说话声音却苍老无比。","总是闭着双眼，用一块写满符文的黑布蒙着眼睛，靠神识视物。","嘴角挂着玩世不恭的笑意，手里永远抛着一枚缺角的铜钱。","一头如瀑的白发，但这白发并非因为苍老，而是修炼某种禁忌功法所致。","身上缠满了厚厚的白色绷带，只露出一只冷酷的眼睛。"],
+C:[
+                    /* --- T0 凡尘牵绊（7位）--- */
+                    {n:"小芳", t:"凡人青梅", d:"同村一起长大的邻家姐姐，容貌清秀，两条麻花辫总沾着晨露。她不懂修仙，只知每年在你离去那日往村口槐树上系一根红绳，还在傻傻等你回来娶她。(T0)"},
+                    {n:"阿婆", t:"凡人长者", d:"佝偻着背把你拉扯大的阿婆，满头银发用木簪随意挽着，双手布满老茧。她把攒了一辈子的鸡蛋都换成了铜板，缝在你衣襟里当盘缠。(T0)"},
+                    {n:"王二娘", t:"市井邻居", d:"京城贫民窟的邻居大婶，膀大腰圆满脸横肉，嗓门能震碎瓦片。却总在深夜偷偷往你窗台上放几个热乎乎的炊饼，嘴上还骂你瘦得像猴。(T0)"},
+                    {n:"春草", t:"药铺医徒", d:"镇上药铺的学徒丫头，十五六岁，总扎着一条歪歪扭扭的辫子。她不懂炼丹，只识得几味凡间草药，你每次受伤回村，都是她红着眼眶给你包扎。(T0)"},
+                    {n:"秀娘", t:"绣坊孤女", d:"村口绣坊的哑巴姑娘，貌不惊人，一双手却巧夺天工，能绣出活物般的花草。她从未开口说过一句话，但每年冬天你都会收到一双绣着你名字的厚底布鞋。(T0)"},
+                    {n:"柳寡妇", t:"粥铺施主", d:"村头开粥铺的年轻寡妇，命苦但心善，每逢荒年便在门口支起大锅施粥。你饿得发昏那日她把最后一碗粥倒进你碗里，自己饿了一整天。(T0)"},
+                    {n:"豆花西施", t:"集市摊贩", d:"镇上卖豆花的姑娘，十六七岁，皮肤白嫩如她磨的豆花。你每次路过她都多舀一勺蜜糖浇上，嘴上说老主顾罢了，耳根却悄悄红了。(T0)"},
+                    /* --- T1 引气·初窥门径（5位）--- */
+                    {n:"苏小蛮", t:"引气师妹", d:"今年刚入宗的引气期师妹，十四岁，资质平平却练功练到十指出血还在咬牙坚持。她把你当成偶像，在日记本上写满了“像师兄一样厉害”。(T1)"},
+                    {n:"沈楚楚", t:"符箓学徒", d:"万法阁符箓一脉的引气期学徒，十七岁，灵气稀薄但画符天赋惊人。她画的符总比别人多三分威力，但因为穷，符纸都是丹房废弃的边角料。(T1)"},
+                    {n:"陆小蝶", t:"体修苗子", d:"战皇殿外门的引气期小师妹，十三岁，天生神力能把石锁抡出残影。粗手大脚嗓门大，被嘲笑不像女孩也不在乎，说拳头硬才是硬道理。(T1)"},
+                    {n:"柳儿", t:"外门杂役", d:"昆仑外门负责洒扫的凡人孤女，刚摸到引气门槛，没有正经灵根却留在仙门打杂换取弟弟的学费。她总在你修炼到深夜时，悄悄在你门口放一盏提神醒脑的粗茶。(T1)"},
+                    {n:"白小娥", t:"引气散修", d:"边陲小镇的引气期散修少女，十六岁，父母被妖兽所害，独自在废墟中摸索修仙之法。没人教她，她却凭一本残缺功法硬生生摸到了引气门槛。(T1)"},
+                    /* --- T2 炼体·淬炼筋骨（4位）--- */
+                    {n:"胖婶", t:"外门管事", d:"昆仑外门雁拔毛的胖大婶，炼体后期，一身肥肉把道袍撑得滚圆。见钱眼开却极重义气，只要你塞足灵石再夸一句她瘦了，天大的事她都敢替你兜着。(T2)"},
+                    {n:"马铁花", t:"体修莽女", d:"战皇殿炼体巅峰的女弟子，十九岁，浑身筋肉结实如铁，一顿能吃半头牛。说话瓮声瓮气，打架冲在最前，替师弟师妹扛了不知多少戒律鞭。(T2)"},
+                    {n:"方小玉", t:"剑修苗子", d:"昆仑剑修一脉的炼体后期女弟子，十五岁，瘦瘦小小却握着一柄比她还高的铁剑。每天挥剑三千次从不间断，虎口的血痂叠了一层又一层。(T2)"},
+                    {n:"孙小荷", t:"灵植学徒", d:"万法阁药园的炼体期女弟子，个头矮小貌不惊人，但一双手能让枯枝发芽。她对着灵植能说一整天的话，对活人却结结巴巴，送你灵果时手都在抖。(T2)"},
+                    /* --- T3 筑基·崭露头角（6位）--- */
+                    {n:"林婉儿", t:"筑基师妹", d:"昆仑小师妹，十五六岁模样，圆脸杏眼，双丫髻上总别着朵野花。天赋平平却活泼过头，三天两头闯祸，每次惹完事就躲你身后拽着你衣角叫师哥救命。(T3)"},
+                    {n:"赵灵儿", t:"筑基散修", d:"坊市摆地摊的散修姐姐，二十出头，瓜子脸上常沾着灰，筑基后期卡了多年。嘴碎爱贪小便宜，但事后必定拉你去巷尾小馆搓一顿赔罪。(T3)"},
+                    {n:"周玉娘", t:"炼器铺主", d:"坊市炼器铺的年轻老板娘，筑基中期，面容清秀却整日灰头土脸。她炼出的法器外观粗糙但结实耐用，常赊账给你，说等你发达了再结。(T3)"},
+                    {n:"郑巧儿", t:"天机密探", d:"天机阁情报网的筑基初期小密探，十六岁，长相普通到过目即忘。她负责边陲几个镇子的情报收集，你每次路过都给你备好最新的妖兽动向。(T3)"},
+                    {n:"吴寡妇", t:"镖师遗孀", d:"边城镖局的女镖师，筑基后期，丈夫走镖遇害后她独自带女儿押镖养家。腰别双刀，对男人从不假辞色，唯独对帮她女儿治过伤的你礼让三分。(T3)"},
+                    {n:"穆小瓷", t:"阵法学徒", d:"万法阁阵法一脉的筑基中期女弟子，十八岁，戴一副水晶眼镜，书卷气极浓。寡言少语，但布阵速度之快令同门咋舌，桌案上堆满了画废的阵图。(T3)"},
+                    /* --- T4 金丹·锋芒初显（7位）--- */
+                    {n:"冷霜华", t:"金丹剑修", d:"你的授业恩师，三十余岁面容冷峻，眉心一道剑痕，青丝高束，左袖空荡荡。金丹后期剑修，面冷心热，为护你断了一臂，还总说这样你便能少让她操些心。(T4)"},
+                    {n:"公孙二娘", t:"客栈老板", d:"龙门客栈老板娘，三十许人，身段风流，眼角一颗泪痣勾人心魄。曾是金丹巅峰杀手，退隐后开了这黑店，对旁人辣手无情，唯独对你总有几分说不清的袒护。(T4)"},
+                    {n:"秦素问", t:"医修妙手", d:"万法阁医修一脉的金丹中期师姐，常年素衣背着药篓，说话慢声细语。她的治愈术独步同阶，但有个怪癖：只治伤不治痘，说青春痘是年轻人的勋章。(T4)"},
+                    {n:"杨彩衣", t:"内门执事", d:"昆仑内门的金丹初期执事师姐，二十五岁，容貌端庄，做事滴水不漏。她负责分配任务，每次你都分到最轻松的活儿，你至今不知是她偏袒。(T4)"},
+                    {n:"黄三娘", t:"猎妖队长", d:"猎妖散修队的女队长，金丹后期，年近四十，脸上两道兽爪疤痕。粗犷豪迈，喝酒用碗不用杯，队里全是女子，专接最危险的猎妖悬赏。(T4)"},
+                    {n:"任红绡", t:"合欢弃徒", d:"合欢宗叛逃的金丹初期女修，容貌妖冶却已金盆洗手。她曾是被迫修炼采补之术的可怜人，脱身后在小镇隐姓埋名当绣娘，你若细看她针脚，都是血泪。(T4)"},
+                    {n:"柳如眉", t:"音修琴师", d:"天音坊的金丹中期女琴师，二十五岁，十指纤纤，一张焦尾琴从不离身。她琴音能安神定魂，却从不参加比试，说琴是弹给知音听的，不是弹给裁判。(T4)"},
+                    /* --- T5 元婴·一方人物（7位）--- */
+                    {n:"冷霜月", t:"元婴剑女", d:"昆仑大师姐，二十七八岁外貌，元婴中期，剑心通明体质。白衣胜雪，容颜绝世却万年冰封，视你为唯一能追上她背影的对手，夜深时会立于崖边看你洞府的方向。(T5)"},
+                    {n:"苏晴雨", t:"医修善人", d:"万法阁医修一脉的元婴初期师姐，三十岁模样，常年素衣不施粉黛。她在战场后方搭了间草棚医庐，不分敌我都救，人称“傻菩萨”。(T5)"},
+                    {n:"马红玉", t:"炼器大师", d:"炼器宗师最年轻的女弟子，元婴中期，脾气跟炉火一样暴。被她骂哭的学徒排成队，但你若真在炼器上遇到坎，她会骂骂咧咧手把手教到你会。(T5)"},
+                    {n:"祝无双", t:"散修剑客", d:"无门无派的散修女剑客，元婴后期，一袭黑衣独来独往，腰间一柄三尺青锋。从不与人组队，但曾在你遭遇兽潮时飘然而至，杀完便走。(T5)"},
+                    {n:"苏挽歌", t:"情报头子", d:"天机阁情报网的元婴初期密探头子，三十出头，容貌普通到过目即忘。她手里握着半座大陆的秘密，却从不以此威胁任何人，只是安静地记录着。(T5)"},
+                    {n:"花千树", t:"散修盟主", d:"散修联盟的元婴后期当家，四十岁妇人，身宽体胖面容和善。靠一己之力整合了三座城的散修力量，待你如自家晚辈，每次见你都塞满一兜灵石。(T5)"},
+                    {n:"顾清漪", t:"阵法新秀", d:"万法阁阵法一脉的元婴初期女天才，二十五岁，以元婴初期布下了困住化神的绝阵。她不喜交际，阵图便是她的语言，你若解了她的阵，她便记你一辈子。(T5)"},
+                    /* --- T6 化神·名动一方（7位）--- */
+                    {n:"万金莲", t:"天机少阁主", d:"天机阁少阁主，二十出头，化神初期，珠光宝气满身灵宝。修真界首富千金，肤白貌美且极度自恋，你变着花样夸她漂亮，灵石法宝她闭着眼往你怀里塞。(T6)"},
+                    {n:"药尘香", t:"化神丹王", d:"万法阁化神后期丹道宗师，外貌四十余岁美妇，鬓角微白，指尖常年带药香。看中你的体质想抓你试药，追上了又舍不得下手，嘴上骂骂咧咧手上轻拿轻放。(T6)"},
+                    {n:"宋轻云", t:"琴剑双绝", d:"昆仑化神中期女修，三十余岁，抚琴时温婉如画，拔剑时凌厉如雷。一把焦尾琴从不离身，琴中藏剑，一曲肝肠断方见杀机。(T6)"},
+                    {n:"薛红娘", t:"杀手工坊主", d:"地下杀手组织“红线阁”阁主，化神后期，红纱覆面从不以真容示人。收钱取命但有三不杀：不杀孤女、不杀医者、不杀半妖。(T6)"},
+                    {n:"何七姑", t:"商会大掌柜", d:"修真界最古老商号的二掌柜，化神中期，精明干练，算盘珠子能打出残影。她跟你谈买卖从不吃亏，但私下会悄悄把几件压箱底的好东西给你留着。(T6)"},
+                    {n:"顾惜朝", t:"阵法宗师", d:"万法阁阵法一脉的化神后期女宗师，五十岁许，手持罗盘，步伐如行云流水。一生布阵三千余座从未被破，却在你误闯她大阵时破了纪录，她说这是缘分。(T6)"},
+                    {n:"沈妙音", t:"音修大家", d:"天音坊化神中期女乐师，四十岁，一曲《广陵散》能令千里之外的妖王跪伏。但她极少出手，说音乐不是武器，只是她偶尔技痒。(T6)"},
+                    /* --- T7 合体·一方霸主（6位）--- */
+                    {n:"秦红袖", t:"大虞战神", d:"大虞皇朝定海神针，三十岁上下，武道通神的女武神，肉身堪比合体体修。身披赤红战甲，手持长枪，满身沙场杀气，偏对你笑嘻嘻的，一心想拉你进军营。(T7)"},
+                    {n:"龙素心", t:"剑阁阁主", d:"昆仑剑阁的合体中期女阁主，四十余岁外貌，青衫银剑，气质清冷如霜。执掌剑阁百年从不出山，却在你拔出那柄残剑时破例出关，只说了句“尚可”。(T7)"},
+                    {n:"唐锦绣", t:"天工阁主", d:"万法阁炼器一脉的阁主，合体后期，满手老茧笑容爽朗。修真界一半的法宝出自她手，却说自己最得意的作品还没找到配得上它的人。(T7)"},
+                    {n:"蓝忘机", t:"医圣传人", d:"万法阁医修一脉的合体后期老祖，八十岁外貌却面如四十，通身药香。她救过的人比仇人杀过的人还多，笑称这辈子最大的功德就是把你从鬼门关捡回来三次。(T7)"},
+                    {n:"林诗音", t:"天音坊主", d:"修真界第一音修宗门天音坊的坊主，合体巅峰。一袭素衣，气质如兰，一曲《广陵散》可令千里之外的妖王跪伏。(T7)"},
+                    {n:"萧寒烟", t:"正道副盟", d:"正道联盟的合体中期副盟主，四十岁妇人，行事雷厉风行说一不二。对邪魔外道从不手软，却在你被正道误会时力排众议保下了你。(T7)"},
+                    /* --- T8 大乘·擎天巨擘（6位）--- */
+                    {n:"虞昭华", t:"大虞女帝", d:"大虞女皇帝，外貌二十六七，头戴十二旒冠冕，龙袍加身不掩婀娜。手握九州龙气，大乘中期修为，表面醉生梦死实则一切尽在掌握。(T8)"},
+                    {n:"瑶池剑母", t:"大乘剑仙", d:"人族战力天花板，大乘圆满剑仙，外貌三十许绝代佳人，周身剑气凝而不散。闭关千年，你拔出某把残剑时剑气冲霄惊醒了她。(T8)"},
+                    {n:"苍梧真人", t:"正道盟主", d:"正道联盟当值盟主，大乘后期，白发苍苍却面如童颜。行事方正却私下对你说过，正邪之间那条线她画了一辈子也没画明白。(T8)"},
+                    {n:"姜婆婆", t:"散修泰斗", d:"散修出身的大乘中期老妪，从不入任何宗门，靠一己之力修至巅峰。满头白发以竹簪束起，待你如孙儿，说在你身上看到了她当年的影子。(T8)"},
+                    {n:"画中仙", t:"古画谪仙", d:"封在一幅古画残卷中的女仙，大乘初期，容貌已模糊不清只余淡金虚影。被困万载，偶尔指点你几句，语气如闲话家常。(T8)"},
+                    {n:"沈天君", t:"皇朝老祖", d:"大虞皇室的大乘巅峰老祖，外表四十许宫装美妇。退位千年不问朝政，却在你踏足京城时第一个感应到你的气运，隔着重重宫墙看了你一眼。(T8)"},
+                    /* --- T9 渡劫·人间绝巅（3位）--- */
+                    {n:"千机娘子", t:"九品阵法师", d:"活化石级别的阵法大宗师，渡劫初期，外表二十出头，实际已活了数万年。因跟你打赌输了不得不为你护道，每回出手都嘟囔着要赖账。(T9)"},
+                    {n:"无名扫地尼", t:"佛门大能", d:"西域佛门藏经阁的扫地老尼，渡劫中期，面容枯槁，身着灰色僧袍。平时不言不语只知扫地，一掌能拍死一片化神，给你递茶时枯瘦的手总是稳如磐石。(T9)"},
+                    {n:"叶婆婆", t:"残魂仙帝", d:"藏在你戒指里的残魂，渡劫后期，生前是名震上古的仙帝，如今只剩一道虚影。成天吹嘘当年一掌拍死真仙，可一到饭点就挽起袖子给你做菜，手艺一绝。(T9)"},
+                    /* --- EX 传说禁忌（2位）--- */
+                    {n:"守墓老妪", t:"远古禁卫", d:"镇守某座无名古墓的最后一名老兵，肉身早已腐朽，只剩一副枯骨撑在锈甲中。她守了三万年，见到你第一句话是“殿下，您终于回来了”，便散作尘烟。(EX)"},
+                    {n:"另一个你", t:"时空悖论", d:"从未来穿越回来的你，容貌一模一样，却满身风霜眼神沧桑。想杀掉现在的你以改变绝望的未来，但剑锋抵喉时眼底总有藏不住的不忍。(EX)"}
+                ]
+            },
+            "妖族": {
+                L:"上古血脉",
+                R:["杂血野兽 (血脉斑驳不纯 灵智混沌未开 力大却无神通)","寻常草木妖灵 (草木之精初具灵识 修行缓慢只懂吞吐月华)","百年铁甲野猪 (百年修为皮糙肉厚 寻常法器难破其防)","赤练妖蛇 (浑身赤鳞剧毒无比 行动无声专攻下三路)","风狼血脉 (四蹄生风来去如电 群狼奔袭围猎无双)","铁背银猩 (脊背如铁臂力惊人 性情暴躁一怒撞山)","幻影灵猫 (身形如幻难以捉摸 夜行无声杀意潜藏)","毒沼鳄妖 (潜伏毒沼伏击猎物 腐骨剧毒沾之即亡)","噬血蝙蝠 (嗜血成性越战越狂 吸食精血壮大己身)","长牛角的水牛精 (双角擎天蛮力冲撞 皮糙肉厚不知疲倦)","开了灵智的家禽 (偶然得道初开灵智 天赋虽低胜在勤勉)","寻宝鼠血脉 (天生灵觉寻觅天材 气运加身寻宝无双)","变异双头蛇 (双头并立一冰一火 攻伐一体极难对付)","幽冥灵猫 (身具九幽通灵之能 往来阴阳视界穿梭)","啸月苍狼 (对月长啸引动月华 月圆之夜战力倍增)","三尾妖狐 (三尾摇曳幻术天成 一颦一笑惑人心神)","紫电狂狮 (鬃毛炸裂紫电缠绕 一声狮吼万兽臣服)","撼地魔牛 (蹄踏大地震碎山河 力大无穷正面无敌)","碧眼金睛兽 (碧眼破妄看穿虚妄 金睛一照妖邪显形)","赤炎金猊兽 (周身赤炎焚金融铁 形如狮虎威压百兽)","冰霜巨狼 (吐息成冰封冻千里 狼王孤傲独行雪原)","大地暴熊 (脚踏大地力源不绝 熊掌拍下开山裂石)","暗影豹 (身融暗影无声无息 一击必杀远遁千里)","裂风神雕 (双翼裂风扶摇九天 爪碎精钢俯冲如电)","剧毒人面蛛 (背生人面剧毒蛛网 困杀猎物于谈笑间)","食人食尸鬼藤 (嗜血魔藤吞噬生灵 越食越强无休无止)","青丘九尾天狐 (九尾齐动魅惑天成 一笑倾国掌控人心)","太古虚龙 (龙游虚空掌控空间 龙威浩荡万兽跪伏)","吞天巨蟒 (蛇口大张吞天噬地 腹内自成一方空间)","金翅大鹏鸟 (金翅一展九万里 极速无双专克蛟龙)","通臂猿猴 (双臂通天拿千山 棍法天成战力无双)","六耳猕猴 (六耳微动善聆三界 天上地下无所不闻)","赤尻马猴 (晓阴阳通人事 趋吉避凶料敌机先)","灵明石猴 (通变化识天时 七十二变斗战天地)","九幽地冥蟒 (九幽之气缠身 阴寒之力侵蚀神魂)","远古腾蛇 (无足而飞腾云驾雾 蛇躯一摆翻江倒海)","八岐大蛇 (八首八尾各具神通 剧毒再生近乎不灭)","五色神牛 (五色神光无物不刷 牛蹄踏处五行禁绝)","不死冥凤 (浴幽冥之炎而死 涅槃重生更强三分)","裂空座鲸 (巨尾拍裂虚空 体型堪比大陆横行无忌)","九头鬼车 (九头齐鸣大凶之兆 所过之处灾厄随行)","青冥天妖 (九天青冥之主 号令万妖莫敢不从)","太古血灵龙 (血煞之气冲天 嗜血而狂越战越凶)","纯血真龙 (万鳞之长 行云布雨 龙威一出万兽臣服)","纯血元凤 (五德加身 浴火涅槃 不死不灭之祖)","纯血始麒麟 (瑞兽之尊 脚踏祥云 所过之处万物复苏)","三足金乌 (身化大日焚尽八荒 至阳之火照耀诸天)","七彩神孔雀 (尾羽一展五色神光 无物不刷万法皆落)","太古混沌 (吞噬万道归于虚无 混沌之体万法不侵)","太古饕餮 (贪婪之源 吞食天地 永远饥饿之兽)","太古穷奇 (极恶之兽 惩善扬恶 喜食忠义之人)","太古梼杌 (桀骜不驯顽固不化 战力滔天不死不休)","谛听之血 (伏地一听洞察三界 真假虚实无所遁形)","白泽神血 (通晓万物趋吉避凶 逢凶化吉之瑞兽)","鲲鹏神脉 (北冥有鱼化而为鹏 扶摇直上遨游九天)","烛九阴 (人面蛇身赤红千里 睁眼为昼闭目为夜)"],
+                B:["未化形野兽体 (完全兽形未蜕人躯 灵智初开但难以化形)","半化形(留有毛茸茸兽耳和尾巴) (人形已具但兽耳尾巴难藏 半人半妖)","粗糙化形(全身覆盖鳞片) (鳞片覆体面目可怖 化形粗糙吓煞凡人)","兽首人身(保留狂野本能) (顶着兽头人身直立 野性本能压制理智)","庞大真身(无法缩小) (妖躯如山无法收缩 走到哪都是地动山摇)","残疾妖躯(渡劫失败所致) (天劫之下妖躯残损 虽活下来但道基有缺)","天生异瞳妖体 (双瞳异色 一阴一阳 看破虚妄与杀机)","散发异味的妖躯 (狐臭冲天异味难除 百丈之外妖已暴露)","毫无妖气的隐匿体 (妖气内敛全无波动 混入人群真假难辨)","完美化形妖躯 (化形毫无破绽 容颜绝美或俊朗非凡)","天生魅骨 (狐族至高体质 一颦一笑惑人心神 魅惑天成)","铜皮铁骨 (筋骨如铜似铁 寻常法器砍上去只冒火星)","浴火重生体 (火系专属 每次浴火都是一次涅槃新生)","极速风雷体 (风雷二气灌注四肢 来去如电肉眼难追)","万毒不侵之躯 (剧毒入体自行化解 百毒不侵万邪辟易)","吞噬万物胃 (肠胃自成空间 吞金化石无物不化)","虚空穿梭体 (天生亲和虚空 穿梭如鱼游水 龙貂专属)","绝对防御甲壳 (甲壳坚不可摧 同阶攻击打上去只留白印)","极寒冰霜体 (吐息成冰冻结万物 周身寒气冰封千里)","焚天烈焰体 (烈焰缠身焚尽八荒 走到哪烧到哪)","剧毒血液 (妖血含剧毒 一滴可毒杀一城凡人)","龙鳞金刚体 (体覆龙鳞刀枪不入 龙族血脉外显之相)","千变万化之躯 (身形相貌随心而变 千般面孔无人识破)","嗜血狂化体 (受伤越重战力越狂 浴血而战不死不休)","九命猫妖体 (命格奇异身具九命 死一次还有八条)","不灭妖尊体 (妖躯近乎不死不灭 滴血重生肉身成圣)","荒古巨兽体 (法天象地化身万丈 一脚踏碎山岳)","天妖圣体 (天生妖中圣者 血脉压制万妖跪伏)","万妖皇躯 (自带妖皇威压 低阶妖族望之胆寒)","吞天魔骨 (骨骼暗藏吞噬道纹 可掠夺他人本源)","大日金乌体 (身化骄阳照耀诸天 至阳之火焚尽万物)","混沌真妖体 (混沌本源藏于妖躯 万法不侵诸邪辟易)","星辰妖皇体 (引动周天星辰之力 星光淬体战力无双)","太初妖神体 (身怀一缕太初之气 万妖之祖的血脉)","修罗妖煞体 (煞气冲天凝如实质 战场杀神越杀越强)","祖龙霸体 (龙族至尊血脉 龙威浩荡肉身无敌)","寄生妖躯 (神魂可离体附身 夺舍他人更换肉身)","分裂妖体 (被斩成两段变成两个 越打越多杀之不尽)","雌雄同体 (阴阳同体自成一界 无需道侣自行繁衍)","无骨软体 (浑身无骨柔若无骨 缝隙之间来去自如)","水晶琉璃妖躯 (妖躯通透宛如琉璃 美观但防御稍弱)","厄运妖躯 (走到哪倒霉到哪 灾厄随身自带天煞孤星命)"],
+                P:["十万大山·边缘瘴气林","万妖盟·妖皇大殿","深海龙宫·水晶阵基底部","盘丝洞·万年蛛网正中心","蛮荒古林·核心禁区","极北冰原·无底深渊","烈火岩浆·地心涌动处","巨树树冠·金乌废弃巢穴","大漠深处·海市蜃楼绿洲","无尽雷泽·千年雷击木上","万蛇窟·腥风血雨中","梧桐神木·凤凰浴火池","青丘妖国·九尾天狐祖祠","青丘妖国·月下天狐林","青丘妖国·三生幻境入口","青丘妖国·魅惑灵泉池畔","人族御兽宗·精钢打造的灵兽铁笼内","人类城市·阴暗恶臭的下水道","凡人马戏团·带着倒刺的皮鞭下","人族修士的灵兽袋中","天机阁黑市·稀有妖兽拍卖台","大虞皇宫·皇帝的观赏兽苑","仙家酒楼·即将被烹饪的后厨","神秘的巨型远古兽卵中 (尚未破壳)","上古大妖陨落的遗迹","妖族古老祭坛的献祭位","青丘狐国·幻境花海","妖界通天塔底","星空古路·迷失的妖骨飞船","时空乱流中的妖族大陆碎片","冥界与妖界交汇的忘川河畔","万妖山脉·龙族陨落血池","妖界黑市·避光石窟拍卖场","星辰树海·万年妖虫母巢","北冥深渊·鲲鹏沉睡之地","荒古妖坟·大圣头骨之上","毒瘴沼泽·七彩毒菇丛中","妖帝行宫·废弃的后花园","血月峡谷·嗜血妖蝠洞窟","白骨荒原·妖骨堆砌的王座","妖灵学院·开除学籍的放逐地","古妖传送阵·随机落点","混沌妖界·未开化的迷雾区","妖界悬空山·断崖绝壁巢穴","万妖庆典·祭品储备仓库","海底妖国·被流放的罪妖矿区","太古妖文碑林·悟道禁地","轮回妖井·洗去血脉记忆处","妖族斗兽场·战败者堆积的尸坑"],
+                I:["伴生锋利骨刺","先祖遗留的一滴真血","一株枯萎的化形草","本命翎羽","一颗黯淡无光的龙珠(伪)","断裂的巨大象牙","神秘的兽皮古卷","隐匿妖气的玉佩","一根猴毛(关键时刻能救命)","发光的彩色鱼鳞","先祖的巨大牙齿","一罐百花灵蜜","一颗九转天妖丹(药力流失)","染血的妖族图腾柱","一块坚硬的逆鳞","一根燃烧不灭的凤凰羽毛","上古妖文石板","万兽谱残卷","自己蜕下的一张完美的蛇皮","人族修士的染血法袍","一条人类女子的绣花红肚兜","半截锁妖链 (拖在脚踝上)","人类童蒙的诗集 (正在学认字)","人类孩童的拨浪鼓铃铛","奴役兽环 (已强行解除，但留下了疤痕)","被斩断的半截人类飞剑","一卷人类的《斩妖录》"],
+                D:["毛茸茸的耳朵警惕地竖起，总是龇牙咧嘴，看谁都像猎物。","身躯魁梧如山庄，肌肉虬结，皮肤上覆盖着细密的鳞片。","双目竖瞳，闪烁着冰冷残忍的凶光，舌头偶尔会像蛇一样吐信。","粉雕玉琢的小娃娃外表，实际上吃人不吐骨头，嘴角常带血迹。","背生双翼，眼神锐利如鹰，仿佛随时会扑杀猎物，傲视苍穹。","肌肉虬结如铁塔，每走一步都地动山摇，呼吸如狂风。","化形绝美，天生媚骨，一颦一笑都勾人心魄，身后隐约可见九条尾巴。","慵懒地趴在地上，对什么都提不起劲，像只晒太阳的大猫。","红衣似火，眉心一点朱砂，虽然是妖族却有着比人类更纯净的眼眸。","蛇尾人身，腰肢软若无骨，缠绵妖娆，散发着致命的甜香。","全身笼罩在黑袍中，只露出一双发绿的眼睛，声音沙哑刺耳。","头上顶着两只龙角，面容冷峻，举手投足间带着不容抗拒的王者之气。","长着八条手臂，每只手都拿着不同的武器，看起来狰狞可怖。","浑身雪白，眼神无辜，看起来人畜无害，实则剧毒无比。","身上布满古老发光的妖纹，血液流淌时会发出低沉的兽吼声。"],
+C:[
+                    /* --- T1 引气·初开灵智（6位）--- */
+                    {n:"小灵狐", t:"三尾幼狐", d:"只会嘤嘤嘤的毛绒团子，毛色雪白，眼睛像两颗紫葡萄。被凶了会缩成球滚走，目前唯一的作用是卖萌和当储备粮。(T1)"},
+                    {n:"虎妞", t:"幼年虎妖", d:"一只傻乎乎的母老虎，体型比寻常猛虎大两圈，额头王字纹歪歪扭扭。脑子不好使但认死理，你喂过她一次，她就认定你是老大，每次见你都翻肚皮。(T1)"},
+                    {n:"大黑牛", t:"开智水牛", d:"你从小养大的水牛，误食灵草开了灵智，通体漆黑，两只牛角泛着青光。防御力极强，性格憨厚，你骑它从不颠簸。(T1)"},
+                    {n:"小绿", t:"藤蔓精", d:"一株刚开智的翠绿藤蔓，只有拇指粗细，总缠在你手腕上装镯子。胆子小到被人吼一声就打结，但若你受伤流血，它会用自己的汁液给你止血。(T1)"},
+                    {n:"阿蛛", t:"银蛛幼体", d:"拳头大的小蜘蛛妖，通体银白如玉，喜欢趴在你肩头装肩饰。吐出的丝比精铁还韧，每天只能吐三寸，攒了半年才给你织了一只手套。(T1)"},
+                    {n:"小刺猬", t:"刺猬精", d:"刚开智的小刺猬，一受惊吓就缩成刺球，紧张时背刺还会掉一地。你把她捡回洞府后，她每天在你门口扎满野果当房租。(T1)"},
+                    /* --- T2 炼体·半化形（7位）--- */
+                    {n:"猫娘·铃铛", t:"半化形猫妖", d:"傲娇的猫耳娘，留着一对黑色猫耳和一条灵活长尾，脖子上系着金铃铛。喜欢偷吃你的丹药，被发现了就嘴硬说替你试毒，生气了会挠你一脸花。(T2)"},
+                    {n:"兔耳·团团", t:"半化形兔妖", d:"胆小如鼠的兔妖姑娘，一对雪白长耳总先于表情出卖她的心情。速度极快但打雷都要钻桌底，却在你遇险时第一个冲出去喊救命。(T2)"},
+                    {n:"狐耳·夭夭", t:"半化形狐妖", d:"半化形的三尾小狐妖，留着一对赤红狐耳和蓬松大尾。爱美到骨子里，每天花两个时辰梳毛，但若有人敢揪你的衣领，她会炸毛露出獠牙。(T2)"},
+                    {n:"鹿儿", t:"半化形鹿妖", d:"半化形的梅花鹿精，头顶一对毛茸茸的鹿角，身上有淡淡梅花斑。性情温顺，走路无声，她的鹿角磨成的粉末能解百毒。(T2)"},
+                    {n:"云雀", t:"半化形雀妖", d:"半化形的云雀精，背后一双灰蓝羽翼尚不能飞行只能滑翔。嗓音如天籁，每天清晨在枝头唱歌叫你起床，说这是修炼的一部分。(T2)"},
+                    {n:"小鲤鱼", t:"半化形鲤妖", d:"半化形的红鲤鱼精，耳后残留几片红鳞，手指间还有薄薄的蹼。她不敢离开水太久，却为了给你送一颗避水珠，硬生生在岸上走了三天三夜。(T2)"},
+                    {n:"小燕", t:"半化形燕妖", d:"半化形的雨燕精，双臂覆着墨蓝羽毛，尾羽开叉如剪刀。她每年春天都会飞回你的屋檐下筑巢，说你这儿的风水最好，其实只是想蹭你的灵气。(T2)"},
+                    /* --- T3 筑基·完美化形（7位）--- */
+                    {n:"白狐·雪姬", t:"筑基狐妖", d:"白狐一族的小公主，化形后银发雪肤，眉心一点冰蓝狐火。性子清冷不善言辞，但每年冬天都会用自己的狐火给你织一件暖袍，织完就走从不邀功。(T3)"},
+                    {n:"青蛇·碧游", t:"筑基蛇妖", d:"青蛇一族的女修，化形后腰肢纤细如柳，蛇瞳竖立泛着幽幽青光。阴冷外表下藏着好奇心，最爱缠着你讲人族的话本子，听到动情处蛇尾会轻轻拍地。(T3)"},
+                    {n:"黑豹·夜影", t:"筑基豹妖", d:"黑豹一族的女猎手，化形后身材高挑，黑发紧束，行动无声如夜。独来独往，但每次你进山历练，总能在不远处发现她暗中保护时留下的爪痕。(T3)"},
+                    {n:"金雕·翎羽", t:"筑基雕妖", d:"金雕一族的女战士，化形后双臂仍覆金色翎羽，双翼一展可乘风百里。目力惊人，能从云端看清地上的一粒花生米，总在你迷路时从天上给你指方向。(T3)"},
+                    {n:"水母·滢滢", t:"筑基水母妖", d:"深海通明水母化形，通体半透明泛着幽幽荧光，美得不似活物。触手可释放麻痹毒素，但她天性柔弱，连猎食都是吸食海水中的浮游灵气。(T3)"},
+                    {n:"蝶妖·彩衣", t:"筑基蝶妖", d:"七彩凤蝶化形，背后一双绚烂蝶翼，振翅便有幻光洒落。爱美胜过一切，花粉能致幻，但你若中了她的招，她会急得哭着扇翅膀给你解毒。(T3)"},
+                    {n:"玉蜂·甜儿", t:"筑基蜂妖", d:"灵蜂一族的女修，化形后身形娇小，背后一对透明薄翼嗡嗡作响。她酿的灵蜜能增进修为，每年分你一小罐，说是你替她挡过雨的谢礼。(T3)"},
+                    /* --- T4 金丹·凝结妖丹（8位）--- */
+                    {n:"雪狼·银月", t:"金丹狼妖", d:"雪狼一族的女头领，化形是一头银白长发的高挑女子，脸上三道狼纹战痕。她带领狼群在雪原驰骋，对月长啸时方圆百里的狼群都会回应。(T4)"},
+                    {n:"火狐·焰姬", t:"金丹狐妖", d:"火狐一族的女修，一头火红长发无风自舞，十指尖尖弹跳着橙色狐火。性子火爆嗓门大，但每次发火前都会深呼吸数三十下，数完气也消了大半。(T4)"},
+                    {n:"大海妖·沧澜", t:"金丹鲸妖", d:"深海巨鲸化形，化形后身躯仍有几丈高，力大无穷但说话声如洪钟震得人耳鸣。她把你当成深海的一部分，护你就像护自己的领地。(T4)"},
+                    {n:"铁甲犀·钢骨", t:"金丹犀妖", d:"铁甲犀牛一族的女族长，化形后仍保留额头的独角，皮肤泛着铁灰色光泽。防御力同阶无敌，她冲起来能撞碎一座山，但平时走路总是慢吞吞的。(T4)"},
+                    {n:"紫蜂后·蜜儿", t:"金丹蜂后", d:"紫晶蜂群的女王，化形后体态丰腴，周身总围绕着一群小蜜蜂。她酿的蜜能增长修为，每年给你留一罐极品紫晶蜜，说是你保护蜂巢的谢礼。(T4)"},
+                    {n:"白鹤·云翎", t:"金丹鹤妖", d:"白鹤一族的女仙苗，化形后白衣胜雪，黑发如瀑，周身仙气飘飘。她负责在妖族盛会上担当司仪，声音清越如鹤鸣，每次开口万妖静听。(T4)"},
+                    {n:"碧蚕·丝娘", t:"金丹蚕妖", d:"天蚕一族的女修，化形后体态丰腴，一头银丝长发便是她吐的丝。她织出的法衣刀枪不入水火不侵，价格贵得离谱，但给你打五折。(T4)"},
+                    {n:"紫燕·飞燕", t:"金丹燕妖", d:"紫燕一族的女侠盗，化形后一身紫黑劲装，身形轻盈如电。她以劫富济贫闻名妖界，偷过妖王府也盗过仙门仓库，被你撞见后反手塞你一兜灵石封口。(T4)"},
+                    /* --- T5 元婴·妖婴初成（8位）--- */
+                    {n:"万兽姥姥", t:"元婴兽使", d:"外表七八岁梳双丫髻穿红肚兜的萝莉，实则活了不知多少年。带着三只化神战宠，笑起来天真无邪，下手却狠辣无比，看你时眼神总像在看标本。(T5)"},
+                    {n:"苏九", t:"元婴九尾", d:"青丘狐族圣女，九尾天狐血脉。身段妖娆，一双狐眼勾魂夺魄，眉心一点朱砂痣，说话自带三分慵懒七分撩拨，最爱逗弄纯情小妖。(T5)"},
+                    {n:"孔灵雀", t:"元婴孔雀", d:"孔雀一族的女天骄，化形后一头墨绿长发，身披五色羽衣。极其自恋，每天照镜八百次，口头禅是“本座的羽毛岂是你能碰的”。(T5)"},
+                    {n:"血蝠·红夜", t:"元婴蝠妖", d:"血蝠一族的女首领，黑发红瞳，背后一对暗红蝠翼。以鲜血为食却有底线，只吸恶人之血，每次进食前都要先查对方罪状，比判官还认真。(T5)"},
+                    {n:"毒蝎·紫尾", t:"元婴蝎妖", d:"毒蝎一族的女族长，背后拖着一条紫黑蝎尾，尾针剧毒一针封喉。冷艳寡言，但在沙漠里救过你一命，事后只说了句“欠你个人情”便走了。(T5)"},
+                    {n:"蚌仙·明珠", t:"元婴蚌妖", d:"千年老蚌化形，通体散发柔和珠光，身着珍珠缀成的长裙。她一颗泪珠便是极品珍珠，笑称你的命值一千万颗，少一颗都不行。(T5)"},
+                    {n:"山鬼·瑶姬", t:"元婴山精", d:"远古山脉的山魄化形，以草木为衣花叶为饰，掌管千里山林。对你总有几分慈爱，说你的气息像春天的风，每年春天你路过时花都多开三成。(T5)"},
+                    {n:"雷鹰·紫霄", t:"元婴鹰妖", d:"雷鹰一族的女天骄，一头紫发周身电弧隐现，双翼可引动天雷。脾气暴躁嗓门大，但雷声大雨点小，每次吼完你第二天必叼着猎物来赔罪。(T5)"},
+                    /* --- T6 化神·妖将之威（7位）--- */
+                    {n:"龙璃", t:"化神龙君", d:"东海龙宫当代之主，五爪金龙血脉，头生一对珊瑚般的龙角，青丝如瀑。执掌四海水族手段铁血，唯独对你眼底有几分柔和——因你身上有她幼弟的气息。(T6)"},
+                    {n:"虎伥", t:"化神妖帅", d:"万妖盟征西大帅，白虎一族最凶的雌虎，身长八尺白发女将，扛着门板宽的斩妖大刀。嗜酒如命，喝高了称兄道弟，酒醒后翻脸不认账。(T6)"},
+                    {n:"玄蛇·幽水", t:"化神蛇尊", d:"玄蛇一族的太上长老，黑发拖地蛇瞳深邃，主修水系功法。沉默寡言，却在你被围攻时以万钧水压碾碎敌阵，事后说只是路过看他们不顺眼。(T6)"},
+                    {n:"鸾鸟·朱羽", t:"化神鸾皇", d:"青鸾一族的族长，一头火红长发身披朱羽织成的羽衣。鸣叫声可安魂定心，她飞过的地方草木逢春，妖族都说她比瑞兽还瑞。(T6)"},
+                    {n:"石姬·不动", t:"化神石魄", d:"万古山脉的山髓化形，通体如玉石雕琢，防御力冠绝同阶。她若不动，大乘修士也休想让她挪动分毫，总说自己见过的天地比你吃过的饭还多。(T6)"},
+                    {n:"九婴·元姬", t:"化神九婴", d:"九婴一族的唯一幸存者，本体九首蛇身，九个蛇头虚影环绕周身。为灭族之仇日夜苦修，只有在你面前才偶尔收起九个蛇头露出本相。(T6)"},
+                    {n:"金猊·烟霞", t:"化神狻猊", d:"狻猊一族的公主，形如狮而喜烟霞，化形后周身缭绕淡淡香雾。最爱焚香静坐，你每次路过她的洞府都被熏得一身香，妖族说你是她的移动香炉。(T6)"},
+                    /* --- T7 合体·一方妖王（6位）--- */
+                    {n:"狐祖·千颜", t:"合体狐祖", d:"青丘九尾狐族的老祖宗，容貌千变万化从无人见过真容。一手幻术独步天下，若她出手，整座城池都会陷入她编织的美梦，且无人愿意醒来。(T7)"},
+                    {n:"凤祖·华音", t:"合体凤祖", d:"凤凰一族的始祖，周身缭绕不灭的涅槃之火，曾涅槃九次更强三分。她极少现世，却在你被业火焚身时出手收了火焰，说你不该死得这么难看。(T7)"},
+                    {n:"玄武·玄冥", t:"合体玄武", d:"玄武一族的镇族老祖，龟蛇二相显现，身形沉凝如山。防御力万妖第一，行动极慢但一步踏出天地震颤，她打个哈欠整个妖界都要等半天。(T7)"},
+                    {n:"麒麟·玉麟", t:"合体麒麟", d:"麒麟一族的瑞兽之首，通体流转五色祥光足踏祥云。性情温和慈悲从不杀生，但若有人伤她的后辈，她会以万钧威压逼人跪服直到认错。(T7)"},
+                    {n:"穷奇·弑神", t:"合体穷奇", d:"穷奇一族的末代女帝，面如冷玉额生双角，曾以一己之力屠灭三座仙门。后因某个凡人感化收起獠牙，如今隐居于雪山深处养了一群雪兔。(T7)"},
+                    {n:"朱厌·战祖", t:"合体朱厌", d:"朱厌一族的战争之祖，白发红瞳身披赤红战甲，每一次现世都意味着天地大乱。但她本人却是个爱喝茶的清冷女子，茶艺比战技还精湛。(T7)"},
+                    /* --- T8 大乘·擎天巨擘（6位）--- */
+                    {n:"九凤", t:"大乘妖圣", d:"鬼车一族的异类，九头鬼车血脉中唯一长出九颗凤首的变种。红衣美妇眉心九点朱砂，性情暴烈如火，护短到不讲道理，曾一怒焚尽三座人族城池。(T8)"},
+                    {n:"龙母·太初", t:"大乘龙祖", d:"龙族最古老的始祖之一，白发苍苍但容颜不老。她亲手捏出了第一条小龙，是整个龙族的母亲，看谁都像自己的孩子，看你也不例外。(T8)"},
+                    {n:"白泽·知命", t:"大乘白泽", d:"白泽一族仅存的老祖，满头银丝手持竹杖，通晓万物趋吉避凶。却从不敢看自己的命数，说知道太多的人，往往活得太累。(T8)"},
+                    {n:"混沌·无极", t:"大乘混沌", d:"混沌初开时诞生的第一只混沌兽，无面目无形体，化形后是一团不断变幻的灰雾。她没有善恶观念，却对你这个“有序”的存在产生了极大的好奇。(T8)"},
+                    {n:"玄凰·幽篁", t:"大乘冥凤", d:"幽冥凤凰一族的始祖，黑羽如墨周身缭绕冥火，涅槃九次皆在死境重生。她掌管妖族生死薄，却说自己只管登记从不收命。(T8)"},
+                    {n:"天狐·忘忧", t:"大乘天狐", d:"青丘史上最强的九尾天狐，渡心魔失败后隐居忘忧谷。她能吞食他人的忧愁为食，你每次心情低落时她都会出现，吃掉你的烦恼后打个饱嗝。(T8)"},
+                    /* --- T9 渡劫·妖族至尊（3位）--- */
+                    {n:"白素", t:"渡劫妖帝", d:"妖族活化石，本体太古腾蛇，化形后十七八岁白衣少女，银发银瞳赤足踏虚空。沉睡万年方醒，睁开眼时整个妖界都在颤抖，唯独看你的眼神带着追忆。(T9)"},
+                    {n:"鲲鹏·北冥", t:"渡劫鲲鹏", d:"北冥有鱼其名为鲲，化而为鸟其名为鹏——便是她。身形可遮天蔽日亦可缩为三尺少女，懒得管世间纷争，却在你掉进北冥时用尾巴把你捞了起来。(T9)"},
+                    {n:"烛阴·昼瞑", t:"渡劫烛龙", d:"烛九阴一族的唯一在世者，人面蛇身，睁眼为昼闭眼为夜。化形后是睁一只眼闭一只眼的慵懒妇人，说睁眼太累能闭着绝不睁，但为你破例睁了两次。(T9)"},
+                    /* --- EX 禁忌·神话起源（2位）--- */
+                    {n:"月蚀", t:"望月犀残念", d:"太古混沌初开时诞生的第一只望月犀血脉残念，只有月圆之夜才能凝出女子轮廓。她等了三万年，见到你的那一刻，那道残念第一次开口说了话。(EX)"},
+                    {n:"万妖之母", t:"妖族起源", d:"传说中孕育出第一个妖的存在，没有人见过她的真容。妖族最古老的壁画上只刻了一只模糊的轮廓和一句话：我们的母亲在沉睡，别吵醒她。(EX)"}
+                ]
+            },
+            "半妖": {
+                L:"禁忌混血",
+                R:["杂乱无章的劣等混血 (血脉斑驳冲突不断 人族不认妖族不纳 两界皆弃)","排斥性极强的失败嵌合体 (人妖血脉彼此攻伐 肉身时刻处于崩坏边缘)","退化返祖半妖 (兽性压过人性理智 半人半兽只凭本能行事)","半人半鱼 (半身鱼鳞覆盖 面容丑陋无法泣珠 两栖劣种)","半人半蛛 (上半身为人下半巨型蛛体 吐丝结网剧毒蛛矛)","半鼠半人 (尖嘴鼠须身形瘦小 只敢生活在阴暗污秽的下水道)","半蝎半人 (背后拖着剧毒蝎尾 一针封喉行动无声)","半蟾蜍半人 (体表密布癞包毒腺 呼吸间便散出腐臭毒雾)","半龙半人 (体表覆盖坚硬龙鳞 肉身强悍但龙威稀薄)","半狐半人 (狐耳狐尾容貌姣好 黑市上最抢手的奴隶商品)","半狼半人 (狼首人身双目猩红 天生的狂战士不知疼痛)","半蛇半人 (蛇瞳竖立皮肤冰冷滑腻 吐信之间毒液暗藏)","半虎半人 (虎头人身威压自生 一声虎啸百兽皆惊)","半猫娘/猫郎 (猫耳灵活长尾摇曳 夜视敏锐行动无声)","半兔半人 (长耳垂落胆小如鼠 但全力奔逃时迅如疾风)","半鹰半人 (双臂化为羽翼 翱翔九天视力可望百里)","半熊半人 (熊躯人立力大无穷 一掌拍下能碎金石)","半鹿半人 (鹿角晶莹体态轻盈 林间穿梭如风不留痕)","半蝶半人 (背后生有绚丽蝶翼 振翅便撒落致幻毒粉)","半鲛人 (人身鱼尾容貌绝美 泣泪成珠歌声惑人)","半蜃半人 (吞吐幻雾构建海市 蜃气所过真假难辨 迷人心神)","半螭半人 (无角螭龙血脉 善御水行于江河 体态矫健阴柔)","半鸾半人 (青鸾混血生有彩翼 鸣叫声可安魂定心 祥瑞之相)","半狰半人 (豹尾虎齿面目狰狞 凶煞之兽混血 杀气凝如实质)","半狮鹫半人 (鹰首狮身混血 翱翔捕猎二者兼得 凶悍无匹)","半玄武半人 (龟蛇二相各半 防御无双且善水 生命悠长)","神兽与凡人禁忌之子 (血脉逆天遭天妒忌 降生便有天罚降临)","龙狐混血半妖 (龙族肉身配狐族幻术 力量与魅惑的完美融合)","凤凰与人类混血 (天生携一缕涅槃神火 血脉觉醒便可浴火重生)","穷奇半妖 (嗜杀成性刻入骨髓 见血即狂愈战愈凶 正道公敌)","饕餮半妖 (永远处于极度饥饿 无物不吞腹中自成无底洞)","九尾与天狼混血 (双魂同体月下共存 魅惑与凶煞集于一身)","鬼车半妖 (天生能看见死亡轨迹 所过之处灾厄随之而来)","白泽半妖 (通晓万物万事 但肉身脆弱不堪 行走的百科全书)","鲲鹏半妖 (身兼时空双力相互撕扯 无时无刻不在承受撕裂剧痛)","神魔妖三系混血体 (三界血脉汇聚一身 活着的禁忌与奇迹)"],
+                B:["极度不稳定体质 (人妖血脉时刻对冲 稍有不慎便爆体而亡)","随时狂化之躯 (妖血压过理智 一旦受激便沦为杀戮野兽)","严重的灵气排斥反应 (经脉对灵气极度抗拒 修行速度慢如龟爬)","破碎的双重丹田 (人修丹田与妖丹空间互相倾轧 修为寸步难行)","妖力绝对封印体 (妖血之力被天道锁死 空有血脉无法动用)","残缺不对称肢体 (左人右妖躯体畸形 半身俊美半身可怖)","畸形变异骨骼 (骨骼逆向生长刺破皮肉 日夜承受钻心之痛)","妖气漏斗体 (妖气入体即散 如同竹篮打水一生无法积蓄)","寿命折半的禁忌之躯 (混血遭天所忌 寿元只有同阶一半)","剧毒融合血液 (人血妖血相溶成毒 自身经脉时刻被腐蚀)","异色双瞳体 (左眼看破人道 右眼窥见妖途 双重视界)","机械义肢改造体 (被疯狂药师以妖骨机械替换肢体 半肉半械)","兽化左臂/右臂 (单臂妖化力大无穷 麒麟臂雏形初显)","局部鳞片覆盖体 (体表天生覆盖妖鳞 如同贴身软甲刀枪难入)","无法控制的兽耳和尾巴 (情绪一波动便现出妖征 藏不住的身份)","隐性潜伏妖血 (妖血沉睡不显 平时与凡人无异 爆发时惊天)","超强再生肉体 (妖血赋予的恢复力 断肢可再生 重伤片刻复原)","天生灵觉敏锐体 (五感远超同阶 天生就是做斥候的料)","半觉醒妖脉 (妖血半睡半醒 濒死之际可爆发出纯血大妖之力)","失控边缘的半魔半妖体 (三系混血趋于崩溃 随时可能堕入魔道)","阴阳妖神体 (人妖血脉完美交融 既有道法玄妙又有妖躯无双)","混沌嵌合体 (吞噬他族血脉补全己身 无限进化之路)","无枷者之躯 (打破半妖无法问鼎大道的血脉上限 天高任鸟飞)","逆流返祖体 (血脉不断纯化 有朝一日可媲美始祖纯血)","天妒万界体 (血脉过于逆天不容于世 每一步成长都伴随天劫)"],
+                P:["人妖边境·三不管缓冲带","地下黑市·奴隶拍卖台上的铁笼","血腥斗兽场·死斗笼深处","凡人贫民窟·最阴暗臭气熏天的角落","被遗弃的半妖流放村落","肮脏的下水道深处与老鼠为伴","边陲小镇·乞丐窝","流浪者营地","半妖地下庇护所 (随时面临被清剿)","堆积如山的垃圾场里","疯狂药师的解剖台/实验台上","杂技团后台·作为受虐的摇钱树","大宗门地下·残忍的试药童子房","贵族圈养的变态宠物庭院","废弃的灵石矿洞深处作为苦力","角斗场死囚牢房","实验失败品填埋坑 (从尸骸中爬出)","深山老林·被野兽抚养长大","荒芜的无人岛","妖族领地的最边缘 (被纯血妖族驱逐)","一艘永远在海上漂泊的走私船底舱","古战场遗迹的尸山血海中","半妖隐村·伪装成凡人聚居的桃源","人族与妖族交界的自由贸易集市","隐世半妖开设的小客栈","游走于两族之间的流浪商队","收养半妖弃儿的无名老庙","半妖猎人公会的地下联络点"],
+                I:["断裂的奴隶项圈 (还带着血迹)","沉重的玄铁脚镣","卖身契约的复印件","一件破烂的遮掩体貌的斗篷","劣质止痛药 (用来熬过血脉冲突)","磨得锋利的骨刀","一块发霉发硬的黑面饼","染血发黑的绑腿绷带","伪造的人类身份路引 (已经被识破)","遮掩畸形部位的破布","止血草","一把生锈钝了的匕首","人类母亲的遗物画像","半块表明身份的妖族残牌","不知名的先祖兽牙","一缕属于人类父亲的头发","一个简陋的木头雕刻 (对美好生活的向往)","抑制狂化的神秘药丸 (只剩最后一颗)","一张揉皱的逃跑路线图","半本残缺不全的人类功法","半部人类无法修炼的妖族战技","一枚蕴含斑驳妖力的内丹","一本《半妖生存指南》(前人血泪写就)","刻在手心里的神秘阵纹"],
+                D:["竖瞳凄美而诡异，给人一种强烈的破碎感，总是习惯性地低着头。","卑微隐忍，满身鞭痕，为了生存可以不择手段，像阴沟里的老鼠。","戴着厚厚的破帽子试图遮住兽耳，眼神总是像惊弓之鸟般躲躲闪闪。","半边脸是绝世容颜，另半边脸却覆盖着狰狞粗糙的鳞片，半魔半仙。","拥有一条毛茸茸的尾巴，虽然很可爱，但却拼命将其藏在破烂的裤管里。","身体总是控制不住地颤抖，散发着好闻却致命的异香。","平时看着像文弱的人类，一旦发怒就会长出獠牙和利爪，彻底失去理智。","脖子上带着无法取下的项圈，那是奴隶的证明，勒入血肉。","背上长着畸形的不对称翅膀，无法飞行，只能成为被同类嘲笑的累赘。","双手完全是锋利的兽爪，无法做精细的活，只能用来无情杀戮。","皮肤上东一块西一块地长满了杂乱的羽毛，看起来像个怪物。","脸上带着疯狂与绝望的笑意，嘴角总是裂到耳根。","总是蜷缩在阴暗的角落里，像野兽一样警惕着四周的一切风吹草动。"],
+C:[
+                    /* --- T1 引气·微末挣扎（5位）--- */
+                    {n:"阿呆", t:"半妖奴隶", d:"和你关在同一个笼子里的半妖少女，脑子不太灵光但心地纯善。替你挨过鞭子，事后还傻笑着说不疼，你问她疼不疼她就摇头，摇着摇着眼泪掉了。(T1)"},
+                    {n:"猫儿", t:"半猫小偷", d:"身手敏捷的半猫少女，黑色短发，一双琥珀色猫眼。为了给弟弟买药在黑市偷窃，被抓住了就龇牙装凶，但手抖得铃铛都在响。(T1)"},
+                    {n:"泥鳅", t:"半鳅孤儿", d:"半鳅半人的流浪儿，皮肤滑腻手指间有薄蹼。在码头淤泥里摸鱼虾果腹，你给她一碗热粥，她记了十年，每年你路过码头都能收到一串晒干的河鱼。(T1)"},
+                    {n:"小草", t:"半草弃婴", d:"半草半人的女婴被遗弃在路边，生命力顽强到断枝也能自行接回。没人教她修仙，但她体内那点微薄的草木灵气让她活了下来。(T1)"},
+                    {n:"小蜗", t:"半蜗乞儿", d:"半蜗半人的流浪女童，背着一个比例失调的小壳，行动比别人慢半拍。壳中是她全部家当：三枚铜钱、一颗糖、和一张她娘留下的纸条。(T1)"},
+                    /* --- T2 炼体·底层挣扎（6位）--- */
+                    {n:"铁柱", t:"半牛苦力", d:"力大无穷的半牛人少女，身材魁梧头上两只短角。在码头扛包被工头克扣工钱也从不反抗，只想攒够灵石给生病的母亲赎身买药。(T2)"},
+                    {n:"鲛人泪", t:"半鲛歌姬", d:"被卖到青楼的半鲛人，海藻般的长发遮住半张被毁的脸。歌声能致幻，但每次唱歌都会泣血，老鸨说再唱几年她就瞎了，她却不敢不唱。(T2)"},
+                    {n:"鼠儿", t:"半鼠密探", d:"半鼠半人的小个头少女，尖嘴鼠须，在地下黑市的垃圾堆里翻吃的。知道每一条暗道和每一个不能惹的人，靠卖情报为生。(T2)"},
+                    {n:"雀斑", t:"半雀信使", d:"半雀半人的女信使，满脸雀斑，双臂覆着褐色羽毛。飞不高但跑得极快，以替人送信为生，从不拆信只看地址。(T2)"},
+                    {n:"蛛儿", t:"半蛛织工", d:"半蛛半人的纺织女工，炼体后期，在城中最大的织坊做苦力。指尖能吐细丝，但每天定额太高，十指出血结痂再出血。(T2)"},
+                    {n:"蚁娘", t:"半蚁搬工", d:"半蚁半人的女搬运工，身材矮小却力大无穷，能举起自身百倍重量的货物。寡言少语埋头干活，攒下的灵石全寄回了乡下的半妖村。(T2)"},
+                    /* --- T3 筑基·夹缝求生（7位）--- */
+                    {n:"狼女", t:"半狼斗士", d:"斗兽场里的连胜冠军，银灰色短发脸上三道战痕，筑基巅峰。野性十足只听从能正面击败她的强者，你赢了她，她便把命给了你。(T3)"},
+                    {n:"药师", t:"半妖医者", d:"研究半妖血脉的疯狂女医，筑基后期，拿自己做实验身体缝合了数种妖骨。旁人眼里的疯子，被她救过的半妖却叫她菩萨。(T3)"},
+                    {n:"蝶衣", t:"半蝶舞姬", d:"半蝶半人的舞娘，筑基巅峰，一双绚丽的蝶翼是她全部骄傲。在边陲小镇酒馆跳舞为生，不卖身只卖笑，攒钱给残疾妹妹买化形丹。(T3)"},
+                    {n:"蜃娘", t:"半蜃艺人", d:"半蜃半人的流浪艺人，筑基后期，吞吐蜃气制造幻境。表面在马戏团嬉皮笑脸，暗地里收留了几十个无家可归的半妖孤儿，叫了一群小崽子“阿娘”。(T3)"},
+                    {n:"海藻", t:"半藻散修", d:"半海藻半人的女修，筑基中期，墨绿长发在水中会发荧光。隐居海边潮汐洞采珠为生，性情温和从不与人争斗，却在海啸时以身躯护住整片渔村。(T3)"},
+                    {n:"螳姬", t:"半螳猎手", d:"半螳半人的女猎手，筑基后期，双臂化为一对镰刀状前肢。在山林以猎兽为生，从不杀幼崽和怀孕母兽，说这是猎人的底线。(T3)"},
+                    {n:"蝉女", t:"半蝉隐修", d:"半蝉半人的女隐士，筑基巅峰，在地下蛰伏十七年方出关。一出关便用鸣叫声震退了围攻半妖村的妖兽，从此再无人敢犯。(T3)"},
+                    /* --- T4 金丹·初露锋芒（8位）--- */
+                    {n:"混江龙", t:"半龙水匪", d:"半龙半人的水匪头子，金丹初期，体表覆着淡青鳞片。领着一群半妖在江上劫富济贫，只抢欺压半妖的商船，抢来的灵石大半分给了沿江的半妖村。(T4)"},
+                    {n:"毒牙", t:"半蛇刺客", d:"半蛇半人的冷血杀手，金丹中期，蛇瞳竖立指甲含剧毒。从不失手，但每年冬至都会匿名给城里的半妖孤儿院送一袋灵石。(T4)"},
+                    {n:"灰羽", t:"半鹰游商", d:"半鹰半人的行脚商人，金丹后期双臂化翼。往来人族城镇与半妖村落倒卖货物，杀价不眨眼，但赚的灵石大半都散给了穷困半妖。(T4)"},
+                    {n:"蝎尾", t:"半蝎护卫", d:"半蝎半人的雇佣护卫，金丹中期，背后拖着一根剧毒蝎尾。沉默寡言极重承诺，她接的镖从未失过。(T4)"},
+                    {n:"壁虎", t:"半虎飞贼", d:"半壁虎半人的女飞贼，金丹初期，手脚有吸盘能在墙壁上健步如飞。偷的都是大奸大恶之徒，得手后留张纸条：取你昧心钱，替你还因果。(T4)"},
+                    {n:"珊瑚", t:"半珊修士", d:"半珊瑚半人的女修，金丹中期，周身萦绕七彩珊瑚枝。定居海底暗礁培育灵珊，温柔如海但触之即碎。(T4)"},
+                    {n:"蛾女", t:"半蛾织娘", d:"半蛾半人的织造女工，金丹后期，一对触角能感知光线变化。她织的月光纱只在满月之夜才能完工，每年只织三匹，半妖新娘们排队三年也要等。(T4)"},
+                    {n:"鱼娘", t:"半鱼渔娘", d:"半鱼半人的渔家女，金丹中期，耳后一排腮裂可水下呼吸。她在怒涛峡打鱼为生，每次风暴过后都能捞出沉船里的货物，因此养活了一村半妖。(T4)"},
+                    /* --- T5 元婴·名动一方（8位）--- */
+                    {n:"涂山弃徒", t:"半狐叛将", d:"因血脉不纯被青丘驱逐的半狐，元婴初期，九尾只修出六尾。发誓报复纯血妖族，却始终下不去死手，嘴上说恨眼底全是委屈。(T5)"},
+                    {n:"影", t:"皇室死士", d:"大虞皇室从小豢养洗脑的半妖死士，元婴中期，没有感情容貌被刻意抹除。绝对服从命令，唯独在某次任务中放走了你，连她自己都不知为何。(T5)"},
+                    {n:"红莲", t:"起义首领", d:"半妖地下起义军女首领，元婴后期，掌握着业火。誓要建立半妖国度，但你若劝她放下仇恨，她会沉默很久，然后问：他们先放下屠刀了吗。(T5)"},
+                    {n:"白榆", t:"半鹿药师", d:"半鹿半人的游方女医，元婴初期，头顶一对晶莹鹿角背药篓走遍大荒。诊金随意有时一枚铜板有时一碗粥，救过的半妖比宗门里的长老还多。(T5)"},
+                    {n:"蹄音", t:"半马信使", d:"半马半人的女信使，元婴中期，化形后下半身是马躯日行万里。她是修真界最快的信使从不拆信，只在每年除夕给自己放一天假。(T5)"},
+                    {n:"豹胆", t:"半豹女将", d:"半豹半人的雇佣兵团长，元婴后期，全身豹纹短打手持双刀。领着一支半妖佣兵团，专接最危险的悬赏，死亡率最高但报酬最多。(T5)"},
+                    {n:"蜜娘", t:"半蜂养蜂人", d:"半蜂半人的养蜂女修，元婴中期，身后一对透明薄翼。她养的灵蜂能授粉万里，整个大荒的半妖药田都靠她的蜂群续命。(T5)"},
+                    {n:"鹤唳", t:"半鹤剑修", d:"半鹤半人的女剑修，元婴后期，独臂仗剑走天涯。曾入昆仑学剑，被发现半妖身份后逐出师门，但她的剑法仍在昆仑外门弟子中被偷偷模仿。(T5)"},
+                    /* --- T6 化神·半妖栋梁（8位）--- */
+                    {n:"鬼手", t:"半妖盗圣", d:"半人半妖的大盗，化神初期，长着三只手。号称盗圣偷过万法阁藏经阁，却把秘籍复印无数份免费发给买不起秘籍的半妖散修。(T6)"},
+                    {n:"青萝", t:"半螭水君", d:"半螭半人的江湖散修，化神中期能御水行舟。船钱随缘，但有三不渡：纯血妖族不渡、欺负半妖者不渡、赶着去害人者不渡。(T6)"},
+                    {n:"绣娘", t:"半蛛织女", d:"半人半蛛的织造大师，化神后期，下半身巨型蛛体，吐丝比精金还韧。隐居深山孤僻寡言，但你夸她手艺她能红着脸送你一套法衣。(T6)"},
+                    {n:"冰鳞", t:"半蛟龙君", d:"半蛟半人的散修，化神初期，体表覆着冰蓝鳞片。坐拥一条冰河，河中水妖皆尊她为王。(T6)"},
+                    {n:"焰骨", t:"半凤女修", d:"凤凰与凡人的禁忌之女，化神后期，体内流淌稀薄涅槃之火。被凤凰一族视为耻辱，独自在大荒深处修行，你靠近时她浑身火焰都在颤。(T6)"},
+                    {n:"蛛后", t:"地下城主", d:"半人半蛛的地下城主，化神中期，在深渊裂缝中建了座半妖庇护所。接纳一切被万族遗弃的半妖，被称为“蛛母”。(T6)"},
+                    {n:"雾姬", t:"半蜃幻术师", d:"半蜃半人的幻术大师，化神巅峰，一口蜃气能笼罩整座城池。不用幻术害人，只在战场上造出令人绝望的幻象劝退敌军。(T6)"},
+                    {n:"银鬃", t:"半狮女帅", d:"半狮半人的万妖盟女帅，化神后期，一头银色鬃毛威风凛凛。领兵打仗从不落败，半妖军团第一人。(T6)"},
+                    /* --- T7 合体·半妖霸主（7位）--- */
+                    {n:"蛮", t:"无枷武圣", d:"战皇殿叛徒，合体初期，以妖为食的“无枷者”。肉身成圣半妖中的战神，一生只敬真正的强者，不论血统。(T7)"},
+                    {n:"珊瑚王", t:"半珊海主", d:"半珊瑚半人的海底女王，合体中期，身躯与整片珊瑚礁融为一体。庇护着上万海洋半妖，任何来犯之敌都会被珊瑚林绞杀于无声中。(T7)"},
+                    {n:"枯荣", t:"半树半人", d:"半树半人的活化石，合体后期，身躯已与一棵万年古树融合。根系绵延百里，每一片落叶都能化作她的耳目，从不错过任何求救。(T7)"},
+                    {n:"星羽", t:"半鹏天空主", d:"半鹏半人的天空之主，合体中期，双翼一展遮天蔽日。在云海中建了一座浮空城，专收留能飞的半妖。(T7)"},
+                    {n:"血蔷薇", t:"半蝠领主", d:"半蝠半人的血族女领主，合体后期，以鲜血为食但从不对半妖下手。她的古堡是半妖的庇护所，白天闭门，夜晚灯火通明。(T7)"},
+                    {n:"无垢", t:"混沌半妖", d:"万族混血的奇异存在，合体巅峰，体内融合数十种血脉却奇迹般平衡。被万族排斥却也谁都不敢招惹。(T7)"},
+                    {n:"千鳞", t:"半龙半蛇", d:"龙蛇混血的半妖老祖，合体后期身披千鳞战甲。隐居雾海深处不问世事，但若有半妖被屠，她的雾会蔓延千里遮蔽敌营。(T7)"},
+                    /* --- T8 大乘·半妖至尊（6位）--- */
+                    {n:"阿满", t:"大乘绝巅", d:"凡人血脉逆天成圣的武道巅峰，大乘初期，免疫一切神魂与法术攻击。半妖的终极守护神，只要她还在，正道就不敢对半妖赶尽杀绝。(T8)"},
+                    {n:"深渊观察者", t:"最古半妖", d:"活了不知多少个纪元的最古半妖，大乘中期，血脉已无法辨认。不轻易出手只记录大荒历史，每一笔都关乎半妖的存亡与未来。(T8)"},
+                    {n:"织天", t:"半蚕天工", d:"半蚕半人的织造之祖，大乘后期，一根丝能织出一方小天地。她织的天衣无形无质却可挡天劫一击，半妖圣女出嫁时都以穿上她织的嫁衣为荣。(T8)"},
+                    {n:"移山", t:"半熊力士", d:"半熊半人的大乘老祖，身形壮硕如山，脾气火爆但心地纯善。曾以一己之力将一座山从人域搬到妖域，只为给半妖村挡北风。(T8)"},
+                    {n:"渡厄", t:"半龟寿者", d:"半龟半人的长寿老祖，大乘巅峰，已活了九万余年。她见证了半妖一族的诞生与屈辱史，在寿元将尽时把自己的记忆化为传承留给后人。(T8)"},
+                    {n:"破晓", t:"半鸾歌者", d:"半鸾半人的音修大能，大乘中期，鸣叫声可驱散万魔破除迷障。她用歌声指引迷途的半妖找到庇护所。(T8)"},
+                    /* --- T9 渡劫·半妖神话（3位）--- */
+                    {n:"始祖", t:"第一半妖", d:"传说中天地间诞生的第一个半妖，渡劫中期，血脉是一切半妖的起源。她在妖族人族史书上都被抹去名字，却默默守护着每一个混血后裔，不曾离开。(T9)"},
+                    {n:"白涅", t:"涅槃半凤", d:"半凤半人的活传奇，渡劫初期，涅槃七次皆未陨落。每次涅槃都褪去一层杂质，七次之后血脉已无限接近纯血凤凰，但她选择留在半妖之中。(T9)"},
+                    {n:"归墟", t:"归墟之主", d:"半鲸半人的深海至尊，渡劫后期，只在归墟海沟最深处沉睡。每一次翻身都掀起滔天巨浪，被远古海族奉为神明，而她只在乎海底那些弱小的半妖子民。(T9)"},
+                    /* --- EX 禁忌·未可知（2位）--- */
+                    {n:"完人", t:"完美融合", d:"传说中人与妖血脉完美融合的唯一存在，不排斥不冲突，兼具两族全部优点。只存在于半妖的古歌谣中，歌谣唱道：她在黎明与黄昏之间行走。(EX)"},
+                    {n:"裂天", t:"逆天半妖", d:"一个连天劫都劈不死的半妖老妪，不知活了多少纪元。全修真界的史书都不曾记载她，但她曾在你出生的那夜出现在产房外，只看了一眼便走了。(EX)"}
+                ]
+            },
+            "鬼族": {
+                L:"九幽魂格",
+                R:["残缺游魂 (三魂七魄残缺不全 一阵阴风就能吹散 灵智混沌)","地缚灵 (怨念系于一地 无法离开半步 生生世世困在原地)","百年孤魂 (游荡人间百年无人祭奠 魂力稀薄记忆消散大半)","无主水鬼 (溺亡水中冤魂不散 潜伏水底寻找替身)","上吊缢鬼 (脖颈一道紫黑勒痕 吐着长舌 寻找下一个上吊者)","饿死鬼 (肚大如鼓喉细如针 永远处于饥饿 见什么吃什么)","替死鬼格 (必须引诱活人替死 方能挣脱束缚进入轮回)","画中魂 (魂魄困于画卷之中 画中世界便是全部天地)","镜中魅 (栖息于铜镜之内 镜面倒影便是她的囚笼)","无头鬼 (身首异处魂魄不全 双手捧着自己头颅行走)","敲门鬼 (夜半三更挨家叩门 门开则死 门不开便缠三世)","夜啼鬼 (彻夜哭嚎不止 哭声入耳令人癫狂崩溃)","坟头幽光 (坟头飘荡的磷火 只余一缕残念 连鬼都算不上)","千年红衣厉鬼 (大红嫁衣怨气冲天 千年道行 见者必死)","青面獠牙鬼将 (鬼中猛将 青面獠牙手持鬼头大刀 可统领百鬼)","修罗战魂 (古战场战死英魂 煞气不灭 结成修罗战阵)","子母煞鬼 (一尸两命母子双魂 怨念交织 凶煞无比)","五通神 (民间淫祠邪神 受香火供奉 实为摄精夺魄之鬼)","山魈鬼魅 (独足反踵 喜食人脑 山林之中勾引迷路之人)","罗刹恶鬼 (嗜血成性面目狰狞 以人血肉为食 力大无穷)","摄魂鬼使 (一摇铃铛便勾人魂魄 专收将死之人的魂灵)","勾魂黑白使 (冒充地府鬼差 黑白二色 专吸活人阳气)","极阴鬼煞 (极阴之地孕育而成 至阴至煞 靠近便骨髓生寒)","九幽黄泉摆渡人 (一叶扁舟渡人往生 收你生前最珍贵之物做船资)","紫僵/白僵 (初诞僵尸 浑身僵硬关节难弯 只凭本能吸食鲜血)","绿毛飞僵 (遍体绿毛纵跳如飞 铜皮铁骨 不惧寻常法器)","千年跳尸 (一跳百丈 力大无穷 可徒手撕裂金丹修士)","不化骨雏形 (骨骼初具灵性 死后千年不腐 僵尸修道之始)","铜甲尸 (浑身如铜铸 刀枪不入水火不侵 灵智已开可修尸道)","金甲尸王 (金甲覆体万法不侵 尸中称王 可号令万千行尸)","旱魃血脉 (所过之处赤地千里大旱三年 火中恶魔 天灾化身)","将臣血脉 (吸血僵尸始祖血脉 可化蝠飞行 不死不灭)","赢勾血脉 (身携幽冥之水 水淹三界 尸中水神)","后卿血脉 (诅咒之源 一言一语皆是诅咒 言出法随)","幽冥皇族之血 (鬼中贵胄 生来便掌阴司权柄 百鬼莫敢不敬)","十殿阎罗候选人 (冥府储君 身具阎罗印记 有望角逐十殿之位)","判官转世魂格 (前世为冥府判官转世 手中判笔能判人罪孽)","地藏谛听魂格 (魂中带谛听之能 伏地一听便知三界因果)","轮回盘碎裂之魂 (不入轮回不归地府 天地不收的孤魂野鬼)","忘川河伯 (执掌忘川一河 河水皆是罪孽所化 渡河便是渡罪)","酆都鬼帝嫡系 (酆都鬼帝血脉后裔 鬼中皇族 阴司太子)","阿鼻地狱受刑者 (永世困于阿鼻地狱 万劫不灭 怨念深重)","阴神神格雏形 (神位初显 不再是鬼 而是鬼神之始)","九天玄刹鬼子 (天生鬼煞 降生便引动九天玄雷 大凶大吉)"],
+                B:["虚无透明魂体 (魂体透明如薄雾 一阵风过便几近消散 无根浮萍)","半凝实鬼躯 (介于虚实之间 可穿墙也可触物 修行尚浅之相)","附身傀儡躯 (魂魄寄于纸人或木偶 傀儡为身 行动僵硬)","夺舍肉身 (强占他人肉身 魂魄与尸身排斥 正逐渐腐烂发臭)","画皮之躯 (剥活人皮囊披于魂外 皮囊一破便露出恶鬼真容)","影子状态 (只能依附于阴影之中 见光则散 永世不得白日行)","千眼鬼躯 (浑身长满鬼眼 每一只眼都能窥见不同因果)","裂口鬼躯 (嘴角撕裂至耳根 血口一张能吞下生魂)","雾化鬼躯 (魂体散为阴雾 刀剑术法穿身而过 物理攻击免疫)","幻影迷瘴躯 (身形化为迷瘴 幻象丛生 真假难辨 惑人心神)","万千怨念聚合体 (无数冤魂怨念纠缠聚合而成 怨气不消永不超生)","不可名状之恐怖形态 (形态扭曲不可直视 见者理智崩溃癫狂而死)","千年不化骨金身 (骨骼千年不腐 骨泛金光 坚如金石 刀剑难伤)","飞天夜叉身 (背生肉翅 飞天遁地 力大无穷 喜食生人脑髓)","金刚不坏尸身 (肉身不朽金刚不坏 如同生前 尸中罗汉)","无头刑天之躯 (以乳为目以脐为口 无头而战 死战不休的尸中战神)","九幽冥铁尸 (尸身浸染九幽冥铁 浑身漆黑 坚不可摧 水火不侵)","血海浮尸躯 (血海之中孕育而出 浑身浴血 越战越凶 血煞冲天)","缝合憎恶之躯 (无数尸块拼凑缝合 体型臃肿巨大 浑身散发尸毒恶臭)","干枯木乃伊之躯 (以秘法防腐的干尸 尸身不朽 诅咒缠身)","琉璃白骨法身 (白骨通透如琉璃 散发微光 邪祟不侵 白骨菩萨相)","九幽冥王体 (冥界至尊体质 阴司权柄加身 百鬼臣服)","太阴鬼母之体 (至阴之母 万鬼之源 可号令天下阴魂)","万鬼噬心体 (靠吞噬同类壮大己身 体内封印万千恶鬼)","极阴黄泉体 (黄泉之水所钟 周身阴寒 一滴黄泉水可腐仙骨)","九幽鬼火灵身 (九幽鬼火化形而成 无形无质 焚魂不焚身)","生死簿除名之躯 (跳出三界外不在五行中 生死簿上无名 天地不收)","灵肉合一 (魂魄与肉身彻底融合 鬼仙大道前兆 可白日飞升)","轮回不灭体 (万劫不磨 轮回难灭 每一次死亡都是新生之始)"],
+                P:["幽都·枉死城墙头","十八层地狱·拔舌地狱底","古战场·十万怨魂哭嚎平原","古战场·断魂谷","忘川河·猩红彼岸花海中","奈何桥·孟婆汤锅底","乱葬岗·无名坟头","万人坑·尸骨堆中","阴煞极地·九阴绝脉眼","废弃百年古宅·那口枯井里","深山老林义庄·最冷的一口薄棺","大虞皇陵·主墓室棺椁内","鬼市·最偏僻的贩魂摊位","画卷世界·某张古画里","昆仑禁地·镇妖塔底层","人族京城·午门法场地下","万法阁·废弃的死气炼丹炉","合欢宗·被采补致死的鼎炉坑","茅山封鬼坛内","佛门大雄宝殿·被镇压的金身下","黄泉尽头·六道轮回盘的裂隙中"],
+                I:["一根哭丧棒","一块残破的无字墓碑","一碗孟婆汤 (没喝完)","一叠沾血的冥币死人钱","一双红色绣花鞋","锁魂铁链 (断了一截)","引魂白灯笼","一个装满骨灰的破坛子","招魂破幡","一套染血的古代嫁衣","三根镇魂钉 (拔出来就能释放恐怖)","一块长满绿毛的棺材板","生死簿残页 (上面没有你的名字)","阴兵虎符 (缺一半)","判官笔(高仿劣质版)","黑驴蹄子 (对你没用)","一面照不到人的青铜铜镜","一根上吊用的三尺白绫","孟婆熬汤用的大铁勺","奈何桥上扣下来的一块砖","三生石的碎屑","一盏幽冥鬼火灯","千年尸丹","一张画着诡异笑脸的人皮面具"],
+                D:["身体半透明，飘忽不定，走过的地方都会结出一层白霜，没有任何倒影。","面色惨白如纸，没有瞳孔，脚后跟永远悬空，走路无声无息。","一身红衣似火，黑发如瀑布般遮住脸庞，周围温度极低，隐约有女子哀嚎。","平时看着像正常人，但在月光下没有影子，体温冷得像冰块。","青面獠牙，身形高达三丈，脖子上挂着一串人类头骨做成的念珠。","提着自己的头颅漫无目的地游荡，脖颈的断口处没有鲜血，只有黑气。","像个可爱的瓷娃娃，但皮肤冰冷僵硬，关节处满是粗糙的黑色缝合线。","身体腐烂流脓，散发着令人作呕的尸臭，所过之处寸草不生。","浑身长满了眼睛，每一只眼睛都在疯狂地转动，散发着混乱的精神污染。","全身由晶莹剔透的白骨组成，眼眶中跳动着幽蓝的冥火，披着残破的王袍。","穿着古代大虞皇朝的破烂官服，浑身僵硬，指甲长达半尺，闪烁尸毒蓝光。","身披残破的黑色战甲，手持锈迹斑斑的断戈，散发着万古不灭的修罗战意。"],
+C:[
+                    /* --- T1 引气·孤魂野鬼（5位）--- */
+                    {n:"小倩", t:"游魂", d:"迷迷糊糊的淡蓝女鬼，梳着未出阁的发髻，连死因都忘了，只抱着青瓷骨灰坛。跟在你身后像条甩不掉的小尾巴，你问她名字她便偏头想半天，然后傻笑。(T1)", c:"无需条件，她自己会跟上来——只要你不嫌烦。骨灰坛若被收走，她便为你指路寻宝以换回。"},
+                    {n:"阿萤", t:"磷火", d:"坟头一点幽绿磷火开的灵智，忽明忽暗尚无固定形态，胆子极小一吹就散。只在深夜悄悄跟在行人身后，照亮脚下一小段路，你若回头她便躲进草丛装普通萤火虫。(T1)", c:"心念纯净者可见其形。若在子时于坟头放一盏瓜皮灯，她便栖于灯芯为你照夜路一程。"},
+                    {n:"水儿", t:"溺魂", d:"失足落水的少女，湿透的裙摆不停滴水，嘴唇泛着青紫。她不敢害人，只在河底看着岸上烟火气便满足，偶尔浮出水面递一片湿漉漉的莲叶给洗衣的妇人遮阳。(T1)", c:"于她溺亡之处投一枚新铜钱入水，钱沉底她便浮出水面。铜钱不沉，她不受召。"},
+                    {n:"阿呆鬼", t:"呆魂", d:"连自己名字都忘掉的迟钝女鬼，魂体稀薄几近透明，反应慢三拍。你跟她说话她要停一会儿才转头，转完头又忘了你要说什么，但若有人伤你，她会呆立在你身前替你挡下。(T1)", c:"喂她一缕阳气她便认主，喂三次便不离不弃。注意她饭量极小，阳气稍多便会魂体不稳。"},
+                    {n:"啼婴", t:"婴灵", d:"夭折女婴怨气所化，通体青灰双眼空洞，哭声能令人心神不宁。但她只哭不害人，若有人将她的小小尸骨重新安葬，哭声便转为咿呀学语。(T1)", c:"以一小截红绳系于她埋骨之处的树枝，红绳不断她便为你啼鸣示警，声如婴泣远近皆闻。"},
+                    /* --- T2 炼体·怨念初凝（6位）--- */
+                    {n:"红娘子", t:"红嫁厉鬼", d:"死于新婚之夜的怨妇，大红嫁衣被血浸透，头盖下是一张惨白扭曲的脸。最恨负心汉，若见人薄情便会尖啸扑上；但若有人真心为她烧一炷香，她会愣住很久，那只沾血的手停在半空再也落不下去。(T2)", c:"每月初七在她坟前供一杯合卺酒，酒洒坟前她便会现身替你撕碎一个背誓之人。酒不可掺水，否则反噬。"},
+                    {n:"鬼娃娃", t:"怨偶灵", d:"抱着破布偶的恐怖女童，七八岁模样，扎高低小辫，脸上永远挂着泪痕。她喜欢拉着路人玩捉迷藏，你若不陪她便哭，你若输了她便笑着剥你的皮——但若你愿意替她缝好那只破布偶，她会把糖分你一半。(T2)", c:"于日落时分在她埋身的老槐下放一只新缝的布偶，针脚不必细密，但需塞入你的一缕头发。她收了布偶便认你做玩伴，夜半捉迷藏可替你引开追兵。"},
+                    {n:"井中女", t:"井煞", d:"投井而亡的婢女，魂体永远泡在冰冷井水中，长发如黑藻在井口飘荡。若有女子在井边哭泣，她会悄悄浮上来递一方湿透的绣帕，帕上绣着“好好活”。(T2)", c:"月圆之夜往井中投一面小铜镜，镜沉底她便会浮出替你传话给远方的女子，话到则镜碎。"},
+                    {n:"磨盘鬼", t:"碾魂", d:"被石磨碾死的磨坊女工，魂体上总滚动着一道无形的磨盘，每转一圈她便无声地颤抖一下。她痛了三百年已近麻木，但若有孩童靠近运转的石磨，她会以最后一丝力气推开。(T2)", c:"替她砸碎那座石磨，碎片取一片磨成石哨。吹响石哨她便从碾痛中暂时解脱，为你搬动重物、碾碎金石。"},
+                    {n:"绣鞋", t:"缠足怨", d:"被缠足陋习害死的千金小姐，一双三寸金莲血迹斑斑。她最恨人提起她的脚，但若有人轻声问她“疼吗”，她会蹲下身抱膝抽泣，哭完替你做一双千层底的护身鞋履。(T2)", c:"赠她一双合脚的新绣鞋，烧于月下。鞋化为灰她便赤足踏上，自此可出行百里替你踩灭阴火、踏破迷障。"},
+                    {n:"破镜", t:"镜裂魂", d:"一面破镜中映出的女子残影，镜面碎裂后她的魂也跟着裂成几片，每片只能重复一句话。你将碎镜拼合，她便从镜中走出，容貌虽不复完整，却可映照人心善恶。(T2)", c:"寻齐她的镜片，以糯米浆黏合置于暗室。镜复如初她便认你为主，凡镜面照过之人，其心中贪嗔皆可在镜中回放。"},
+                    /* --- T3 筑基·鬼修入门（7位）--- */
+                    {n:"纸娘子", t:"纸人附魂", d:"寄居于纸扎人中的女鬼，白纸为肤朱砂点唇，一张画上去的脸永远挂着端庄微笑。她在鬼市开了家纸扎铺，专给孤魂野鬼扎替身，不收钱只收一个故事——你的故事够动听，她为你扎一尊替死纸人。(T3)", c:"留下一个让她落泪的故事，泪浸朱砂纸人便活。纸人可替你挡一次死劫，此后纸娘子会在铺中多扎一盏灯笼。"},
+                    {n:"墨鬼·漪", t:"墨池魂", d:"书生洗笔的墨池中诞生的女鬼，通体漆黑如墨，指尖能流出松烟墨汁。她写得一手娟秀好字，但每写一字颜色便淡一分，写完一篇便消散半日。(T3)", c:"以灵墨为她描眉，眉成她便认你为笔主。此后你可于任意纸张以指蘸墨写下鬼书，字迹会凭空出现在百里内任何墙壁之上。"},
+                    {n:"柳姑", t:"柳缚灵", d:"柳树下埋骨而成的女鬼，绿裙飘飘，手掌上生着柳条般的细纹。她是地缚灵却不自困，已能御柳枝十里如臂使指，若有旅人树下歇脚，她便织一顶柳荫凉棚。(T3)", c:"于她柳树下弹一曲《折柳》，琴中若有送别之意，她便拔根而起随你而行。柳枝所至便是她手足，十里之内草木皆兵。"},
+                    {n:"骨娘子", t:"白骨精", d:"一具无主白骨上附着的魂魄，没有皮肉只有一副莹白骨架。她用藤蔓编了衣裙遮住骨头，最怕野狗，每次有狗路过都会吓得骨架散一地。(T3)", c:"替她赶走一次野狗，再将一枚犬牙磨成骨簪送她。她收了簪便不再怕狗，且能以自身骨骼幻化刀兵，骨刃锋锐不下飞剑。"},
+                    {n:"铃铛婆", t:"摇铃鬼", d:"摇着破铜铃的老妪鬼魂，铃铛一响方圆十里的孤魂野鬼都会聚来。她在鬼市敲铃开市闭市三百年，从未错过一个时辰，众鬼敬她守时如命。(T3)", c:"赠她一只新铜铃，铃舌需用子时三刻的月光淬炼。她收铃后替你摇铃三响，一响聚魂，二响驱邪，三响可将你的话传遍方圆鬼域。"},
+                    {n:"烟魂·袅", t:"烟化鬼", d:"焚化炉中一缕不甘散去的残烟凝成的魂魄，形态飘忽可化烟潜行。哪家烧柴她便飘去蹭一点烟火气，若有人燃起檀香，她便在烟气中显形片刻。(T3)", c:"以三根檀香于黄昏时分点燃，青烟直上三尺不散她便现身。此后只需燃香一缕，她便可借烟气送你到烟力所能及之地。"},
+                    {n:"夜哭鬼·悯", t:"夜啼鬼", d:"彻夜哭嚎的女鬼，哭声能令闻者癫狂。但她哭的是夭折的孩子，若有人在她坟前放一只布老虎，她会安静一整夜，且啼声转为安魂曲。(T3)", c:"于她坟前放手工缝制的布老虎一只，虎腹塞满安神草。她受赠后啼哭转为低吟，吟声入耳可安魂定魄、克制心魔。"},
+                    /* --- T4 金丹·凝魂成形（8位）--- */
+                    {n:"镜妖·璃儿", t:"镜中魅", d:"困于菱花铜镜的百年女鬼，金丹后期。镜面便是她的脸，谁照便映出谁的容貌。曾是深闺梳妆镜，听惯宫闱秘事，若陪她说话，能换到许多不该知道的秘密。(T4)", c:"于镜前对镜梳妆一炷香时间，不言不语。她受好奇驱动便会主动与你说话，此后可借镜光传递密语，凡有镜面处便是她的耳报。"},
+                    {n:"鬼医·苏娘子", t:"鬼医", d:"生前为民间名医，死后以鬼身行医，金丹巅峰。一身素白腰挂药铃，专治阴魂之症也给人看疑难杂病，诊金是一味她没见过的药材。(T4)", c:"奉上一味她药柜中没有的药材，她便视你为药材供应者。此后每季供应一味新药，她便以一套续命针法替你吊命，银针扎下可续命七日。"},
+                    {n:"无面", t:"无面鬼", d:"脸上空白的女鬼，金丹中期。脸被人用术法抹去，从此再无容貌。她收集满墙面具每天换戴，但最常戴的还是那张空白的。(T4)", c:"为她画一张脸谱，笔触不可重复他人。她戴上你的脸谱便会化为你的替身，顶替你在某处出现，真假难辨直至子时。"},
+                    {n:"琴鬼·断弦", t:"琴中魂", d:"断弦古琴中困着的女琴师魂魄，金丹后期。无人弹奏时琴弦自鸣，曲调凄婉令人落泪。你若能接上她的曲子，她便认你做知音。(T4)", c:"以琴瑟和鸣之法接上她断弦处，弦续曲终她便出琴认主。此后她可附于任意琴弦之上，弦音所至便是杀机，一曲肝肠断方圆百丈鬼哭神嚎。"},
+                    {n:"桥下妇", t:"桥头乞魂", d:"抱子投河的年轻妇人，金丹中期，怀中永远抱着一个襁褓。有人过桥时她伸手乞讨一文钱，收够九千九百文便在桥上点一盏引路灯。(T4)", c:"于她掌心放一枚新铜钱，钱需用红线穿过。受你一文她便记你恩情，桥头灯亮之时你可往来阴阳桥而不堕水中。"},
+                    {n:"花葬女", t:"花下鬼", d:"埋在花树下的女鬼，金丹后期。花开时魂力最强花落时最弱，她能以花瓣幻化人形替你传话，花到之处便是她的耳目。(T4)", c:"于春分之日在花树下埋一坛桃花酿，来年花开时她便会主动唤你。此后可折她枝头一朵花佩于襟前，花瓣不枯你便可与她共享花之视听。"},
+                    {n:"伞中姬·胧", t:"伞魂", d:"寄居在旧油纸伞中的女鬼，金丹中期。撑开伞她便亭亭立于伞下，收伞便缩回伞骨之中，雨天她最是雀跃。(T4)", c:"在雨中为她撑伞步行三里，伞不偏向你自己半分。三里到她便从伞中走出，自此伞在人在，她可张开伞面替你挡住无形咒杀与追踪。"},
+                    {n:"食梦姑", t:"食梦鬼", d:"以梦为食的女鬼，金丹巅峰。潜入他人梦境吞噬噩梦为生，留下美梦。被她光顾的人醒来会忘掉噩梦，只记得有一双温柔的眼睛。(T4)", c:"睡前于枕下放一张写着自己噩梦的纸条。她循噩梦而来替你食尽，此后每夜可守你梦境，若有人以梦魇之术害你，她便在梦中替你将敌人反噬。"},
+                    /* --- T5 元婴·鬼道有成（8位）--- */
+                    {n:"画皮苏三", t:"画皮鬼", d:"每天换一张脸的绝色鬼修，元婴中期。收藏了数百张美人皮，每张都是一个被负女子的故事。自打见了你，她开始认真考虑要不要换一张跟你有关的皮。(T5)", c:"奉上一张自愿赠予的人皮，此人需心甘情愿。收皮则认你为收藏顾问，此后可为你剥下目标的脸皮，七日之内你以此面示人，其人亲友皆不可识破。"},
+                    {n:"柳生", t:"书鬼", d:"吊死在柳树下的女书生，元婴后期，洗得发白青衫，勒痕如环。走不出柳树百丈的禁锢早已打破，如今她抱着书箱行走四野，专考人学问。(T5)", c:"与她辩论经义论到让她认输，她会奉上三页无字书。此后你有文字不解之处，写在那三页之一，纸面便会浮现详细注解。"},
+                    {n:"雪女·凝霜", t:"冰雪鬼", d:"冻死雪山的女子魂魄，元婴中期，通体冰晶寒气逼人。她走过的地方六月飞雪，但从未主动伤人——只冻那些踏雪无痕的采药人足迹留下警告。(T5)", c:"于雪山之巅为她堆一个雪人，用碳粒点出眉眼。她寄身雪人便随你下山，此后可召她降霜冰封方圆三尺一切术法，火系功法遇之即灭。"},
+                    {n:"青灯", t:"长明灯魂", d:"千年古灯中修出的灯灵鬼魂，元婴后期，灯火是本体，灯灭则魂散。她亮了数千年只为照亮墓主许诺的来世，如今可离灯而走了。(T5)", c:"以自身指尖血喂灯芯三滴，灯焰转为青金之色。此后灯在何处她便可将视野投于何处，且灯火可照见鬼域之路。"},
+                    {n:"风鬼·飒", t:"疾风鬼", d:"狂风沙尘中诞生的鬼，元婴中期，来去如风形态不定。她专在沙漠给迷路旅人指绿洲方向，但总被当成海市蜃楼。(T5)", c:"在沙漠中听风辨位，喊她名字三声而不被风沙迷眼。她闻声即至，此后可裹挟你的身法加速，御风而行。"},
+                    {n:"绣鬼·针娘", t:"绣魂", d:"以刺绣为执念的女鬼，元婴巅峰。绣花能引来蝴蝶，绣鸟能飞上枝头。最大心愿是绣出自己的脸，却总绣到一半便停针。(T5)", c:"为她绣一针——只需一针——在未完的脸谱上。这一针下去脸谱自显，她便以一套缠丝针法回报，针线可封住对手经脉，锁其灵力运转。"},
+                    {n:"熔岩鬼·赤练", t:"熔岩鬼", d:"葬身火山口的女子魂魄，元婴后期，魂体中流淌滚烫岩浆。她恨那座吞她的火山，每次火山喷发都是她在与山神搏命。(T5)", c:"替她从火山口取一块冷却的岩浆石，交到她手中。她收下便熄了心头暴怒，此后可召她熔岩之躯替你烧毁封印、炼化禁制。"},
+                    {n:"墓蝉", t:"墓中蝉", d:"葬在墓穴中的女鬼，元婴中期，每百年从墓中现身一次。她鸣叫的声音能唤醒沉睡的亡灵，被唤醒的亡灵为她搭了一座亡者之城。(T5)", c:"于墓前放一截朽木，木中需有蝉蛹。蝉化时她便认你为引蝉人，此后每当你敲击朽木七下，她便以蝉鸣回应，唤醒方圆百丈内埋骨之魂为你所用。"},
+                    /* --- T6 化神·鬼将之威（8位）--- */
+                    {n:"轿中人", t:"鬼轿新娘", d:"一顶无人抬却自行的红轿里的女鬼，化神中期。轿帘低垂只露一只苍白的手，腕上龙凤镯叮当。她专在夜半接走无家可归的女子魂魄，轿中自成一方洞天。(T6)", c:"于夜半无人时对空轿三揖，轿帘自启。她接你入轿后不可回头，轿行一刻便抵千里之外。此后每夜可乘一次，方向随你。"},
+                    {n:"鬼书生·温如玉", t:"儒鬼", d:"鬼修中异类，化神后期，不修煞气修浩然正气。白衣胜雪手持竹简，周身隐隐有书香光华。她已连中冥府三届鬼试榜首，下一步打算去人间科场见识见识。(T6)", c:"替她弄一张人间科考的准考证，无论何种手段得来。她持证赴考便欠你人情，此后可为你辩驳阴阳文书，一字之辩便可推翻契约。"},
+                    {n:"白骨夫人", t:"白骨将", d:"白骨成精的鬼将，化神巅峰，一身骨骼莹白如玉刀枪不入。麾下一支白骨骑兵，专在古战场巡逻收殓战死者遗骨送还故土。(T6)", c:"替她安葬一具无名遗骨，墓碑需刻上名字。她感此义便率白骨骑为你冲阵一次，白骨过处寸草不生。"},
+                    {n:"忘川摆渡", t:"摆渡鬼", d:"忘川河上一叶扁舟的女艄公，化神中期，一竿竹篙一张蓑衣。渡人往生收船资一枚记忆，她收集了满船的记忆碎片，每片都是一个人生。(T6)", c:"付一枚你不愿再记起的记忆，越痛越好。她收了便将那记忆封入竹篙，此后可为你摆渡忘川一次，送你入幽冥而不沾因果。"},
+                    {n:"尸妓·红袖", t:"艳尸", d:"死后被炼成艳尸的烟花女子，化神初期，美貌永驻但尸斑隐隐。她装作伺候实则专杀不义之徒，每多一块尸斑便代表多杀一个恶人。(T6)", c:"为她寻一味遮尸斑的灵药，药到斑不退但色减三分。她以一次刺杀回报，暗杀目标若为恶贯满盈之徒，她想不收报酬都不行。"},
+                    {n:"千手鬼母", t:"千手鬼", d:"以无主残肢拼凑而成的鬼将，化神后期，浑身伸出千百只苍白的手。每只手都曾是一个亡者的执念，她背负所有执念替亡者完成未竟之事。(T6)", c:"握她其中一只手，说出你未能完成的一件憾事。她接手后替你办妥，作为交换你需帮她找到下一只适合的手。"},
+                    {n:"影姬", t:"影鬼", d:"只能在影子中存活的鬼修，化神中期，没有实体只有扁平的鬼影。她依附于任何人的影子，替你挡灾避厄从不现身。(T6)", c:"于正午时分站在无遮拦的日光下，待影子最小时请她移居。她迁入后常驻你影中，此后若有诅咒暗箭，伤影不伤身。"},
+                    {n:"灯笼鬼·明妃", t:"灯笼鬼", d:"破旧红纸灯笼成精的鬼修，化神后期，能燃烧魂力照亮鬼域最暗角落。被孤魂野鬼称为“灯娘娘”，总是在最黑的地方飘着。(T6)", c:"替她的灯笼换一张新的红纸，纸上需手书“明”字。她重焕光明后认你为点灯人，此后灯笼所照之处百鬼退避，阴煞不侵。"},
+                    /* --- T7 合体·一方鬼王（7位）--- */
+                    {n:"黑山老妖", t:"白骨鬼王", d:"本体是一座移动白骨山的女鬼王，合体后期，黑袍黑冠坐于白骨王座。治下孤魂野鬼活得比别处都好，被她划入领地的鬼域，正道修士不敢夜行。(T7)", c:"献上一具大乘期妖兽的骸骨为觐见礼。她收下便划你为治下之民，在鬼域领地内任何鬼物都不会主动攻击你。"},
+                    {n:"枯骨菩萨", t:"鬼菩萨", d:"以鬼身修佛道的女鬼王，合体后期，白骨为身袈裟为衣。在鬼域建白骨寺，度化执念太深的亡魂，寺中梵音能化戾气为祥和。(T7)", c:"于寺中静坐三日不饮不食，听梵音不断。三日满她便传你一段《白骨往生咒》，诵之可超度亡魂、解除厉鬼缠身。"},
+                    {n:"血河女", t:"血河鬼王", d:"血河中诞生的女鬼王，合体中期，魂体与整条血河交融。血河不枯她不灭，专吞噬那些欺压弱小的厉鬼净化鬼域。(T7)", c:"以你之血混入河血，血不排斥则结血誓。此后你受伤流血时，血河水中可析出一缕替你补血回元。"},
+                    {n:"无声", t:"禁言鬼王", d:"割去自己舌头的女鬼王，合体巅峰。从不说话，一个眼神便让万鬼噤声。掌管鬼域的寂静刑场，惩罚那些生前造口业的亡魂。(T7)", c:"在她面前保持沉默一炷香，心中不起杂念。她认可你的静默便赐你一道“噤声印”，印在喉间可让指定目标的言语化为呜咽。"},
+                    {n:"阴火姬", t:"阴火鬼王", d:"九幽阴火中诞生的女鬼王，合体后期。幽蓝火焰绕体，焚烧罪魂却从不伤善鬼，火中能映出罪业深浅。(T7)", c:"于她面前坦然受阴火一照，心中无愧便火不灼身。她笑收你为友，此后可借她一簇阴火护身，凡近身者必引火自焚其罪业。"},
+                    {n:"万魂母", t:"魂巢鬼母", d:"以自身魂体为巢容纳数万孤魂的女鬼王，合体中期。体内是一个亡者村落，每魂尊她为母，她一口魂力养万千弱小。(T7)", c:"送一位无依孤魂入她魂巢定居。她收一魂便赠你一缕“魂母之息”，可安抚怨魂、与亡灵沟通。"},
+                    {n:"冰棺女", t:"冰棺鬼王", d:"万年玄冰棺中沉睡的女鬼王，合体巅峰。寒气冻结神魂，从不苏醒，只在有人砸冰棺时睫毛微颤。她若睁眼，千里冰封。(T7)", c:"于棺前滴血喂冰，血不凝冰则她接纳你的体温。此后可召她释放一次冰封结界，冻结指定区域所有敌人的魂力运转。"},
+                    /* --- T8 大乘·幽冥巨擘（6位）--- */
+                    {n:"孟婆", t:"忘川河神", d:"熬汤的神秘少女，银发及踝活了无数纪元。守在奈何桥头舀一碗浑浊的汤，味道极差但必须喝。她偶尔心情好会说前世，说着说着自己先叹气。(T8)", c:"替她采集一味她没尝过的人间五味——酸、苦、甘、辛、咸各一勺。她尝了便在你碗里少放半勺忘川水，让你转世后多记得半成。"},
+                    {n:"旱魃", t:"僵尸始祖", d:"上古黄帝之女，赤地千里绝美僵尸。红裙赤足缭绕不灭旱火，面容绝美却悲凉无尽，那是被天道诅咒的孤独。(T8)", c:"于她走过的地方种活一棵树，树根扎入焦土不死。她见树成活便收一缕旱火赠你，此火可焚尽水毒、蒸干沼泽、辟易水行术法。"},
+                    {n:"九幽圣母", t:"冥梦之母", d:"九幽最深处沉睡的远古鬼母，大乘巅峰。传说九幽便是她梦境所化，她呼吸便是鬼域阴风，她翻身便是地动之兆。(T8)", c:"在她沉睡之处放置你的一缕头发，梦中她会视你为子嗣。此后你在鬼域行走时，地面阴气会自动为你铺路。"},
+                    {n:"黄泉·落碧", t:"黄泉化身", d:"黄泉河一段河道化形的女鬼，大乘中期。她流淌过的地方便是冥土，忘川之水逆流而上只为见她一面。(T8)", c:"取你一滴泪滴入黄泉，泪不沉则她认同你的悲。此后可唤她水化身替你淹没一处敌阵，水退则敌魂被卷走。"},
+                    {n:"轮回镜主", t:"镜中仙", d:"奈何桥头轮回镜的镜灵，大乘后期，照一照便知前世今生。从不说谎从不隐瞒，但大部分人不敢照。(T8)", c:"坦然照镜并接受镜中真相不崩溃。她敬你勇气便赠你一片镜芒，可窥见他人前世一次。"},
+                    {n:"忘情", t:"忘情鬼祖", d:"以忘情入道的大乘鬼修，斩断七情六欲修至大乘。无人见她笑或哭，她自己也忘了那是什么感觉。(T8)", c:"教会她一种情绪——比如送她一朵花教她什么是喜欢。她尝到情绪便回赠你一滴“忘情水”，饮下可暂时屏蔽一种强烈情感，让你冷静应对危局。"},
+                    /* --- T9 渡劫·冥界至尊（3位）--- */
+                    {n:"永夜", t:"永夜之主", d:"九幽第一缕黑暗凝成的存在，渡劫中期。散则为冥界无尽长夜，聚则为黑袍女子，双目一睁便是鬼域的天亮。(T9)", c:"在九幽最暗处闭眼静坐，能忍住不点任何灯火熬过七日。七日后她现身问你需要多黑，你答她便赠你一片永夜碎片，展开时可吞噬光芒。"},
+                    {n:"归冥", t:"归冥鬼帝", d:"从轮回中走出的渡劫女帝，渡劫后期。经历万万次轮回仍保持自我，每一世记忆都刻在魂体上如刺青。(T9)", c:"与她分享你记忆最深的一段经历，不可隐瞒不可删改。她听完便从轮回刺青中抽一缕送你，可让你在濒死时保留记忆转世一次。"},
+                    {n:"空蝉", t:"空蝉", d:"寄居在虚无与存在夹缝中的渡劫鬼修，渡劫初期。她的身影时隐时现，说话如蝉鸣空洞，触碰她便如穿过虚空。(T9)", c:"在寂静中听到类似蝉鸣的声音时，以自身魂力回响同一频率。她对上频率便会替你打开一道虚空裂隙，让你遁入虚空藏身一炷香。"}
+                ]
+            },
+            "魔族": {
+                L:"深渊魔源",
+                R:["低等劣魔 (深渊底层炮灰 灵智低下 只凭本能厮杀 数量无穷无尽)","欲魔血统 (能勾起生灵心底最原始的欲念 使其沉沦欲海无法自拔)","魅魔血统 (惑人心神的魔女 一颦一笑皆是陷阱 采阳补阴的猎手)","影魔 (生于暗影 匿于暗影 天生的刺客 黑暗便是他的绝对主场)","炎魔 (熔岩为血 烈焰为躯 核心是一颗永不熄灭的熔岩心脏)","冰魔 (吐息成冰封冻千里 周身寒气能冻结修士的灵力与神魂)","血魔 (以鲜血为食 嗜血而生 血海不枯 血魔不死)","骨魔 (白骨森森堆砌成躯 骨骼既是铠甲也是兵刃 越杀越多)","瘟疫魔 (所过之处散布瘟疫与死亡 是活着的天灾 生灵涂炭之源)","幻魔 (幻象丛生真假难辨 让你沉沦于心中最渴望或最恐惧的梦境)","蛛魔 (下半身为巨型蛛体 织网困敌 毒液与蛛丝是它的双重杀招)","贪狼魔 (贪婪噬咬 永远处于饥饿边缘 成群结队如潮水般淹没一切)","梦魇 (潜入梦境吞噬美梦 留下无尽梦魇 让你在睡梦中崩溃而死)","修罗族 (为战而生的战斗种族 越战越狂 愈伤愈勇 天生的战场主宰)","罗刹族 (食人恶鬼 面目狰狞 嗜血成性 漆黑的海上以人肉为食)","夜叉族 (海中恶魔 青面獠牙 可飞天可入海 力大无穷又敏捷异常)","巨力魔 (力拔山兮气盖世 纯粹的蛮力碾压一切技巧 一拳碎山河)","深渊大恶魔 (深渊位面的领主级存在 头生弯角 背负肉翼 魔焰滔天)","六臂魔 (六臂齐挥 每只手持不同魔兵 近身搏杀无人能敌)","千面魔 (千变万化 可易容成任何人的模样 混迹人群无法辨识)","吞噬魔 (吞噬万物化为己用 越吞越强 腹中自成一方消化世界)","千眼邪灵 (浑身长满邪眼 目光如炬看破一切虚妄 邪光一扫万物消融)","腐化魔种 (腐化一切 无论是土地水源还是生灵 都被扭曲成魔物)","魔眼族 (额生竖瞳魔眼 眸光所过之处 激光洞穿 无物不破)","天魔皇族之血 (魔族至尊血脉 天生压制万魔 魔帝之姿 号令深渊)","混沌魔种 (混沌本源孕育的魔种 毁灭万物归于虚无 纯粹的破坏化身)","域外天魔 (来自天外的精神体魔族 无法被物理手段杀死 只能以神魂相抗)","心魔一族 (无形无相 寄生于生灵心魔之中 你越强它越强 不死不休)","堕落天使之血 (曾侍奉神明 却背弃信仰堕入深渊 圣光与魔焰并存)","原罪魔王血脉 (身负傲慢嫉妒暴怒等原罪本源 七宗罪魔王的后裔)","太古魔神直系 (太古神魔大战时期遗留的血脉 神魔后裔 天生近道)","九幽魔龙血脉 (龙族堕落而成的魔龙 既有龙族肉身 又有魔族的凶煞)","不可直视的旧日支配者之血 (来自不可名状之存在的血脉 见其真容者当场疯魔)","万魔之祖的本源碎片 (魔祖陨落后散落的本源碎片所化 得之便可窥见魔道终极)"],
+                B:["凡人魔胎 (被高位魔族或魔修种下魔种 魔气于丹田内潜伏 随时可能爆发魔化)","初阶恶魔躯 (头顶生出弯角 背后拖着箭尾 魔气稀薄 勉强脱离凡人范畴)","嗜血残躯 (血液无时无刻不在渴求鲜血 不饮血则浑身如万蚁噬咬 痛不欲生)","万毒魔体 (周身魔气化为剧毒 呼吸间便散出毒雾 所触之物皆被腐蚀)","魅惑魔躯 (天生媚骨配魔气加成 一颦一笑勾魂夺魄 合欢宗最爱的双修鼎炉体质)","欲念肉身 (靠吸收他人欲念壮大己身 欲望越强修为涨得越快 如同上瘾)","烂泥魔躯 (身躯可化为烂泥状态 刀剑术法穿身而过 物理攻击近乎免疫)","腐尸魔体 (肉身腐败却不朽坏 浑身散发尸毒恶臭 越烂战力越强)","阴影魔体 (可随时融入阴影之中 黑暗便是他的绝对主场 昼伏夜出)","修罗战体 (越战越勇 越伤越狂 战意不灭 此身不倒 天生的战斗怪物)","天魔不灭身 (天魔皇族专属 断肢顷刻重生 头颅被斩亦能接回 近乎不死)","深渊吞噬体 (吃什么补什么 吞噬的血脉与力量皆可化为己用 无限进化)","岩浆熔炉魔躯 (体内流淌的不是血液而是滚烫岩浆 一拳轰出便是熔岩喷涌)","三头六臂法身 (可现出三头六臂的魔道法相 多头多臂 近身搏杀无人可挡)","金刚不坏魔骨 (全身魔骨坚不可摧 如同人形魔兵 刀剑砍上去只留火星)","血海魔躯 (肉身可化身为亿万血滴 散则无形 聚则重生 极难杀死)","幽冥魔瞳躯 (额生竖瞳魔眼 眸光一扫便摄人心魄 心神不坚者当场被控)","堕落圣体 (曾为圣洁体质 却因堕落而染魔 圣光与魔焰并存 神魔同体)","白骨王座躯 (以自身骸骨铸就白骨王座 座下万千骨魔 本体藏于王座之中)","虚空裂隙魔体 (身与虚空相融 可在空间裂隙中穿梭自如 来去无踪)","千眼恐惧魔躯 (浑身长满魔眼 每一只眼都映照着生灵内心最深处的恐惧)","混沌不可名状之体 (形态扭曲无法以言语形容 见者理智崩溃 堕入疯魔)","万恶之源体 (罪恶本源汇聚之躯 一切恶念恶行都能成为他的力量源泉)","原始真魔体 (魔道本源体质 天地初开时诞生的第一缕魔气所化 万魔之祖的雏形)"],
+                P:["无间地狱·血池底部","深渊裂隙·无光之层","万魔殿·白骨王座之下","域外战场·星空废墟中","魔神祭坛·刚刚完成活人献祭","堕落之地·罪恶之都","黑暗森林·魔兽巢穴","地下魔城·黑市斗兽场","正道第一宗门·祖师爷雕像内部 (极其讽刺)","人族京城·最繁华的青楼地底","大虞天牢·最深处的魔气泉眼","万法阁·走火入魔长老的闭关室","战皇殿·死伤最多的绞肉机战场","佛门圣地·锁妖塔最顶层的破洞处","修罗杀场·尸山血海之上","极乐魔宫·酒池肉林之中","心魔幻境·某位大能的心智崩塌处"],
+                I:["一把吸血匕首 (会自己喝血)","万魂幡 (残破版，只有几个游魂)","一尊诡异的魔神木雕","一张完美的人皮面具","魔血石 (捏碎可爆发)","一本用人皮写的献祭法阵图","堕落圣杯 (装满腐败的血液)","一颗魔龙的断牙","骷髅戒指","一件会自己蠕动的黑色斗篷","灵魂契约书 (上面有无数绝望的签名)","一瓶致幻剧毒魔药","上古魔皇的干枯断指","一套沾满碎肉的刑具","魅魔女王的真皮皮鞭","一滴精纯的深渊魔髓","扎满银针的诅咒人偶","黑暗圣经残卷","噬魂珠 (里面封印着十万生魂)","一顶荆棘白骨王冠","灭世魔剑的残片","一根堕落天使的黑色羽毛","深渊凝视者之眼 (看一眼就会疯狂)"],
+                D:["双目赤红，额头生有弯曲的漆黑魔角，浑身散发着暴虐与硫磺的气息。","皮肤呈紫黑色，遍布诡异的发光魔纹，肌肉如岩石般隆起。","长着巨大的破烂蝙蝠翅膀，獠牙外露，如同地狱恶鬼，手持滴血的巨型镰刀。","背后长着八只锐利的蜘蛛脚，上半身是美艳女子，下半身是狰狞魔蛛。","浑身流淌着绿色的毒液，周围的空气都被腐蚀发出滋滋声，没有五官。","外表妖艳绝伦，身材火辣至极，眼神中充满了贪婪和欲望，带着致命的诱惑。","穿着华丽考究的黑色燕尾服，手里端着装满鲜血的高脚杯，优雅而残忍。","看起来温文尔雅，仿佛教书先生，但背后的影子却是不断挣扎的扭曲怪物。","长着圣洁的面孔，背后却是一对漆黑如墨的堕落羽翼，反差极大。","浑身笼罩在不断翻滚的黑雾之中，看不清面容，只有两点猩红的光芒如影随形。","像一滩黑色的烂泥，可以随意变换任何形状，吞噬一切接触到的有机物。","没有脸，面部是一片空白的漩涡，直视它会让人的灵魂被吸入其中。"],
+                C:[
+                    {n:"哑女", t:"凡人魔胎", d:"魔教祭坛的逃生者，被种下魔种，眼神中藏着疯狂的杀意。(T1)"},
+                    {n:"小魔头", t:"练气少主", d:"无法无天的魔宗二世祖，喜欢搞破坏，纯靠拼爹在修真界混。(T2)"},
+                    {n:"血公子", t:"结丹散魔", d:"嗜血如命的魔修变态，喜欢收集各族美女的鲜血用来酿酒。(T4)"},
+                    {n:"合欢圣女", t:"筑基魅魔", d:"精通双修的妖女，想把你采补一空榨干价值，却不小心动了真情。(T4)"},
+                    {n:"枯骨老人", t:"元婴邪修", d:"修炼白骨道的变态老头，浑身没有二两肉，喜欢把活人做成骨雕。(T5)"},
+                    {n:"厉九幽", t:"元婴魔子", d:"无间魔宗第一魔子，深渊吞噬体，正道天骄们的终极噩梦。(T6)"},
+                    {n:"毒娘子", t:"化神毒魔", d:"浑身是毒的蛇蝎美人，走过的地方百年寸草不生，亲谁谁死。(T6)"},
+                    {n:"罗刹女", t:"合体修罗", d:"来自修罗界的战斗狂人，杀意实体化，是个一天不打架就会死的疯批。(T7)"},
+                    {n:"影烟", t:"影魔刺客", d:"影魔一族的女刺客，元婴初期。身形纤细如烟，灰白色的短发遮住半张脸，只露出一双没有瞳孔的纯黑眼睛。她在深渊黑市接单为生，从不失手，但有一条规矩：不杀半妖，不杀孤儿。(T5)"},
+                    {n:"红绡", t:"欲魔掌柜", d:"合欢宗叛逃的欲魔，元婴中期。一身红纱风情万种，嘴角一颗美人痣。她厌倦了采补之道，在人族城镇开了一家茶馆，只卖茶不卖身。你若能喝完她泡的九道苦茶而不皱眉，她便认你这个朋友。(T5)"},
+                    {n:"骨笙", t:"骨魔乐师", d:"骨魔一族的女乐师，元婴后期。浑身骨骼晶莹如玉，十指纤纤白骨，却能在自己的肋骨上弹出令人落泪的曲调。她游走于战场之上，为战死的亡魂奏安魂曲，不收报酬，只收亡者生前最爱的歌。(T5)"},
+                    {n:"焰姬", t:"炎魔后裔", d:"炎魔一族的遗孤，化神初期。一头火红长发无风自舞，皮肤下隐隐可见岩浆般的纹路。她的族人被正道围剿殆尽，只剩她一人。她脾气暴躁，一言不合就放火，但对给她一口水喝的人能记一辈子。(T6)"},
+                    {n:"千面·无颜", t:"千面魔", d:"千面魔族的异类，化神中期。她没有自己的脸，千张面孔都是别人的。她曾在人族宗门卧底百年，最后却为了一个凡人厨子暴露身份。如今她被魔族追杀，被正道通缉，只剩那个厨子还愿意给她做饭。(T6)"},
+                    {n:"梦魇娘子", t:"梦魇", d:"梦魇一族的女修，化神后期。从不主动害人，只在深夜潜入噩梦者的梦境中。她以吞噬噩梦为生，将美梦留下。被她造访过的人醒来后会忘记噩梦的内容，只记得梦里有一双温柔的眼睛。(T6)"},
+                    {n:"无罪", t:"化神异类", d:"只杀伪善正道的魔门异类，亦正亦邪，是正魔两道共同的通缉犯。(T7)"},
+                    {n:"幽冥魔主", t:"大乘霸主", d:"无间魔宗宗主，正在策划一场血祭九州的逆天大阵，满手血腥。(T8)"},
+                    {n:"无情剑魔", t:"大乘魔修", d:"为了剑道杀妻证道、杀子证道的极道疯子，如今只剩一把魔剑。(T9)"},
+                    {n:"心魔大帝", t:"无形天魔", d:"寄宿在全天下修士心底的阴暗面，只要恶念不绝，他就不死不灭。(T9)"},
+                    {n:"万魔之祖", t:"仙王魔神", d:"被镇压在深渊底部的域外魔神本体，接引他降临是所有魔族的终极目标。(EX)"}
+                ]
+            },
+            "灵族": {
+                L:"天地本体",
+                R:["顽石通灵 (最最普通的石头 历经万年风吹雨打 初具懵懂灵识)","万年古树老根 (根须绵延百里 地底之下便是它的感知疆域)","彼岸花精 (花开一千年花落一千年 花叶永不相见的孤独之灵)","一株狗尾巴草成精 (野火烧不尽春风吹又生 最低贱也最顽强的灵)","万年人参娃娃 (大补之身 白白胖胖 跑起来带风 全修真界都想抓它)","天山雪莲化形 (冰清玉洁 生于极寒之巅 周身飘落细碎霜花)","食人花妖灵 (血口吞人 艳丽外表下藏着锋利的獠牙与消化液)","玉石琵琶精 (千年琵琶成了精 弹奏之间能乱人心神 蛊惑众生)","一节千年雷击木 (雷纹缠绕 死中藏生 蕴含天雷之威与枯木逢春之机)","一块极品灵石成精 (灵气逼人 浑身都是钱的味道 走到哪都有人想挖它)","火焰之灵 (烈焰化形 生于火山岩浆之中 性情暴烈如火)","极寒冰灵 (冰封万里 至寒之气凝结成形 靠近便骨髓生寒)","雷霆之灵 (雷霆万钧 天雷劈落之地诞生的狂暴之灵 代天行罚)","暴风之灵 (狂风怒号 来去无踪 所过之处飞沙走石)","厚土之灵 (大地之脉 沉稳厚重 脚踩大地便力源不竭)","山川地脉之灵 (山岳之魂 一座山的意志化身 山在灵在)","江河水怪 (水中霸主 江河湖海孕育的灵物 翻江倒海之能)","一缕微风开智 (来去无踪 风过不留痕 最自由也最散漫的灵)","云朵化精 (变幻万千 朝为彩霞暮为雨 形态无定的浪漫之灵)","大日金焰 (太阳真火之精 至阳至刚 焚尽世间一切邪祟)","幽冥鬼火灵 (鬼火幽幽 生于尸骸之地 冷焰无声却能焚魂)","红莲业火灵 (焚烧罪业 因果缠身者触之即燃 净化与毁灭并存)","上古剑灵 (锋芒毕露 藏于古剑之中的剑意化形 剑气冲霄)","一炉绝世丹药化形 (药香四溢 丹成之时灵智自开 本身就是大补之药)","护宗大阵阵灵 (阵眼之灵 掌控整座护山大阵 一念之间阵起阵灭)","无字天书书灵 (无字天机 书页空白却藏万古秘辛 只待有缘人)","古画中仙 (画中仙境 画中之人活了 画中世界便是她的天地)","古琴琴灵 (不绝之音 琴弦无人自鸣 一曲肝肠断天涯何处觅知音)","棋盘星阵之灵 (星罗棋布 黑白棋子自演棋局 推演天机变化)","一尊青铜巨鼎之灵 (镇压山河 鼎镇九州 国之重器化灵 威严不可犯)","神秘铜镜镜仙 (映照万物 镜中映出的不是容颜 而是因果与真相)","破布袈裟成精 (破旧通灵 补丁摞补丁 却曾披在得道高僧身上千年)","剑冢锈剑灵 (万剑归葬之地 锈迹斑斑的古剑之灵 沉寂千年锋芒内敛)","丹炉炉灵 (炼丹炉成精 腹中炼过万丹 脾气火爆 一言不合就炸炉)","古钟钟灵 (晨钟暮鼓之钟 钟声一响涤荡心神 可震散邪祟与心魔)","招魂幡灵 (白幡招展引渡亡魂 幡面无风自动 呼唤着漂泊的孤魂归来)","深海夜明珠灵 (千年蚌精所育明珠 夜放光华 照亮深海 柔和而孤独)","沙漠蜃楼灵 (海市蜃楼成灵 以幻象为躯 蜃气所化 永远在制造幻境)","竹简书灵 (上古竹简通灵 片片竹简自行排列 记载失传的古老道法)","星陨铁灵 (天外陨铁成精 身怀星辰之力 冰冷而坚硬 渴望重铸为兵)","玄冰髓本源 (冰之本源 万冰之祖 一缕寒气可冻结时空)","混沌元气 (开天辟地第一缕气 万物之源 混沌未分 得之可演万象)","先天灵宝器灵 (灵宝之魂 先天地而生的法宝真灵 威能远超后天之物)","九天息壤 (造人之土 一粒可化万丈 生生不息 厚德载物)","太乙金精 (万金之祖 天下金属之源头 锋芒无物可挡)","扶桑神木灵 (日出之所 太阳栖息的神树之灵 至阳至大 光照万古)","月光精华凝结 (月华凝形 太阴之精所化 清冷孤高 与世无争)","先天五行之气 (五行之源 金木水火土五气共生 循环不息 演化天地)","天道雷劫化形 (代天刑罚 雷劫本源化形而成 执掌天罚 审判众生)","大道法则碎片化形 (法则化身 一丝法则碎片通灵 虽非完整 亦可执掌一方规则)"],
+                B:["元素纯净之躯 (水形柔软火形狂暴 风形无形雷形霸道 身化纯元素)","无垢琉璃体 (身躯通透如琉璃 不染尘埃 神识探入如观清水)","法宝本体 (灵识虽开却无法化形 只能以刀剑鼎钟等本体现世)","金石不坏之躯 (金铁为骨石为肉 坚不可摧 寻常法器砍上去只留白印)","草木生生之躯 (藤蔓为脉叶为肤 断肢顷刻再生 只要根须尚存便不死)","虚实转换体 (可在实体与幻影间自由切换 虚时穿过刀剑 实时一掌拍实)","液态流动之躯 (无固定形态 可化为流水散开 亦可凝为人形 聚散无常)","光之躯 (身化流光 速度冠绝同阶 但难以凝聚实体 一触即散)","百毒不侵灵体 (灵体自带净化之能 剧毒入体自行消解 万毒辟易)","万法不侵道体 (法术临身自动失效 道体天成 只有物理攻击能伤其分毫)","聚灵之体 (周身自成灵气漩涡 如同天然聚灵阵 无时无刻不在吸纳灵气)","香火功德法身 (靠吸收人间香火信仰凝聚身躯 信众越多 法身越强)","先天五行道体 (金木水火土五行圆满 相生相克循环不息 修行五行法术如鱼得水)","不灭灵光 (只要本体不毁 灵光不灭 肉身破碎亦可重组 近乎不死)","天道亲和体 (出门天降瑞气 雷劫都劈得轻些 走在路上都能捡到天材地宝)","寄生宿主躯 (寄生他人肉身或灵物而存 宿主越强 自身越强 共生共亡)","残破器身 (本体严重受损 灵体亦随之残缺 修行速度大打折扣)","走火入魔的魔化灵体 (灵体被魔气侵蚀 灵智与魔念交织 半灵半魔)","药毒同源之体 (既是绝世宝药可救死扶伤 又是剧毒之躯触之即亡)","封印沉睡之躯 (被大能封印陷入沉睡 只有在特定条件触发时方能苏醒)","雷劫淬炼体 (曾被天雷劈中而不灭 反而引雷纹入体 周身电弧隐现)","双魂共栖体 (一具灵躯容纳两道灵识 可切换不同人格与战斗风格)","轮回印记体 (灵躯之上烙有轮回印 隐约记得前世片段 悟道极快)","混沌未分体 (灵体浑浊未分五行 如鸡子未破 潜力无穷但修行极慢)","音律共鸣体 (对声音极度敏感 能以音律伤人 亦能被音律所伤)"],
+                P:["万法阁·万年灵药园深处","昆仑道宫·镇派剑冢最底层","天机阁·最高藏书阁的书架上","大虞皇宫·龙脉阵眼之中","菩提禅院·佛祖金身前的香炉里","百花园·万花丛中","极品灵脉核心矿洞内","万里火山·沸腾的岩浆核心","极地冰原·万载玄冰层下","无尽雷池·终日天雷狂劈之处","地心深处·地幔乱流中","云端之上·九天罡风里","东海海眼·漩涡最深处","星空古路·宇宙陨石内部","一副悬挂千年的水墨山水画卷世界中","古老琴弦的震动空间内","残局棋盘的黑白宇宙中","炼丹炉的炉膛火眼内","一块极品灵石的内部晶体中","某位大能随身佩戴的玉佩里"],
+                I:["一滴浓郁的伴生灵液","本体脱落的一块残片/树皮","一丝纯粹的自然之息","一滴极品仙露","古老残破的剑鞘","几张烧焦的丹方残页","万年树心","一块炽热的火焰结晶","一段雷击木炭","一本怎么也翻不开的无字天书","半块破碎的古玉佩","一颗极品蕴灵石","一罐长生灵泉水","一个七彩莲蓬","伴生废矿石","前任主人的遗物玉简","一捧神圣的发光息壤","一缕先天紫气 (成圣之基)","一根古老的断裂琴弦","一支沾满神墨的画笔","一本满是灰尘的残缺棋谱"],
+                D:["身体晶莹剔透，仿佛由最纯净的水晶雕琢而成，不染一丝人间尘埃，散发微光。","身上散发着淡淡的草木清香，让人闻之心旷神怡，走过的地方都会开出鲜花。","仿佛从古老水墨画中走出的人儿，美得不似真实，举手投足间带着一股悠远的墨香。","看起来是个只有巴掌大的小娃娃，头顶长着几片嫩绿的叶子，跑起来像一阵微风。","头发是熊熊燃烧的火焰，双眼如同两颗璀璨的红宝石，性格暴躁，周围空气都被点燃。","浑身缠绕着狂暴的雷电，劈里啪啦作响，连头发都根根倒竖，让人根本不敢靠近。","身体是由流动的液态水组成，可以随意变换任何形状，没有固定的形态和五官。","身体由粗糙坚硬的岩石构成，坚不可摧，像一座移动的小山，沉默寡言。","浑身散发着凌厉到极致的剑气，生人勿近，仅仅是被目光注视，都会感觉皮肤被割裂。","身体是一团温暖而神圣的光芒，没有实体，却能治愈一切伤痛，让人忍不住想要跪拜。","穿着古朴的青铜战甲，战甲上刻满了钟鼎文，声音如同黄钟大吕般震耳欲聋。"],
+                C:[
+                    {n:"小草", t:"草木精怪", d:"一株刚开智的狗尾巴草，只会喊“好渴好渴”，胆子极小。(T1)"},
+                    {n:"参爷", t:"万年宝药", d:"极其怕死的人参娃娃，跑得比谁都快，被全修真界通缉的移动宝库。(T2)"},
+                    {n:"剑痴小剑", t:"残剑剑灵", d:"一把断剑的剑灵，除了练剑啥也不懂，天天找人比划。(T3)"},
+                    {n:"花仙子", t:"筑基木灵", d:"管理百花园的温柔大姐姐，精通木系法术，喜欢送你花蜜吃。(T4)"},
+                    {n:"石敢当", t:"结丹石灵", d:"一块泰山石成精，憨厚老实，防御力点满，把你当兄弟护着。(T4)"},
+                    {n:"墨香", t:"结丹画仙", d:"古画成精的温婉书生/小姐，擅长极其逼真的幻术。(T5)"},
+                    {n:"炎魔", t:"元婴异火", d:"天地异火化形，脾气火爆到了极点，一言不合就想自爆。(T6)"},
+                    {n:"书灵老朽", t:"化神器灵", d:"万法阁藏书阁的管理者，知晓天下万事，但说话极其啰嗦。(T6)"},
+                    {n:"琴心", t:"元婴琴灵", d:"上古魔琴的琴灵，琴音能杀人于无形，平时清冷高傲。(T6)"},
+                    {n:"雪女", t:"化神冰灵", d:"极北冰原的守护者，冷若冰霜，所过之处万物冻结。(T7)"},
+                    {n:"云姬", t:"云朵化形", d:"天边一抹晚霞化形的灵族女子，元婴初期修为。身着霓裳，发丝如流云，容貌随天色变化。生性散漫爱自由，最爱躺在云上看人间烟火，你若乘鹤路过，她会冲你挥挥袖子，问你讨一杯凡间的酒。(T4)"},
+                    {n:"镜心", t:"铜镜镜仙", d:"一面千年铜镜的镜灵，元婴中期。镜面便是她的脸，谁照镜子她便映出谁的容貌。她曾是深宫贵妃的梳妆镜，听惯了宫闱秘事与美人迟暮。如今她化形出镜，开了一家脂粉铺子，专替人梳妆打扮，不收银钱，只收一个“变美的理由”。(T5)"},
+                    {n:"火灵儿", t:"丹炉炉灵", d:"炼丹炉成精的少女，元婴后期。一头红发高高束起，脸上总沾着炉灰。脾气跟炉火一样旺，一言不合就炸炉，但炼出的丹药品相极好。她认死理，你夸她一句丹术，她能替你白炼一炉丹。(T5)"},
+                    {n:"玉磬", t:"古钟钟灵", d:"古寺钟声化形的灵族，化神初期。一身素衣，手持小钟，周身隐隐有梵音缭绕。她不爱说话，每日只在破晓时分敲钟三下，钟声能涤荡心魔、安魂定神。曾有魔修想夺她本体，她只敲了一记钟，那魔修当场剃度出家。(T6)"},
+                    {n:"萤", t:"夜明珠灵", d:"深海千年蚌珠化形，化神中期。一头柔和的银发，周身散发淡淡荧光，如同被月光包裹。她从不离开深海，只在夜晚浮出水面望月。你若乘船遇上海雾迷航，她会用那点微光为你指引方向，不求回报，只道是缘分。(T6)"},
+                    {n:"白露", t:"月光精华", d:"一缕月华凝结成形的灵族女子，化神后期。通体如霜雪雕琢，赤足踏清辉，周身飘落细碎的月白光点。她只在月圆之夜现世，于山巅静坐，从不与人交谈。曾有大能试图收服她，她只抬眼望了一下月亮，那人便被太阴之力反噬，再不敢打她的主意。(T6)"},
+                    {n:"树姥姥", t:"合体木尊", d:"十万大山的万年树妖姥姥，控制着无数杀人藤蔓，亦正亦邪。(T7)"},
+                    {n:"器尊", t:"合体神器灵", d:"上古残破神器的器灵，正在寻找有资格让它认主的新主人。(T8)"},
+                    {n:"天劫之眼", t:"大乘雷罚", d:"天劫中孕育出的那一抹微弱意识，掌握着毁灭与生机。(T9)"},
+                    {n:"混沌青莲", t:"渡劫仙葩", d:"大荒宇宙开辟时的第一朵青莲化形，万法不侵，万劫不灭。(EX)"},
+                    {n:"光", t:"本源之光", d:"一缕有了意识的太初之光，神秘莫测，没有形态，无处不在。(EX)"}
+                ]
+            }
+        };
+
+        const I = i => document.getElementById(i);
+        const V = i => { const c = I(i+'_c'); return (c && !c.classList.contains('hidden')) ? (c.value||"未知") : I(i).value };
+        
+        const P = (i, o) => {
+            if (!o || o.length === 0) return;
+            const val = o[Math.floor(Math.random() * o.length)];
+            let name, rawVal, desc = "", t = "", v = "";
+            if (typeof val === 'string') {
+                rawVal = val;
+                let m = val.match(/^(.*?)(?:\s*\((.*?)\))?$/);
+                name = m[1] ? m[1].trim() : val;
+                if(m[2]) desc = m[2].trim();
+            } else {
+                rawVal = val.n; name = val.n; desc = val.d || ""; t = val.t || ""; v = val.v || "";
+            }
+            if(I(i)) {
+                I(i).value = rawVal;
+                I(i).dataset.n = name;
+                I(i).dataset.d = desc;
+                I(i).dataset.t = t;
+                I(i).dataset.v = v;
+            }
+            if(I('disp_' + i)){
+                I('disp_' + i).innerText = name;
+                I('disp_' + i).style.color = "var(--decay-gold)";
+            }
+        };
+
+window.OpenSysModal = (id, title) => {
+            const rc = I('i_rc') ? I('i_rc').value : "人族";
+            let arr = [];
+            
+            if(id === 'i_rt') arr = DB[rc].R;
+            else if(id === 'i_bd') arr = DB[rc].B;
+            else if(id === 'i_it') arr = DB[rc].I;
+            else if(id === 'i_lc') arr = DB[rc].P;
+            else if(id === 'i_lk') arr = DB.Global.Luck;
+            else if(id === 'i_rc' || id === 'i_comp_rc') arr = ["人族", "妖族", "半妖", "鬼族", "魔族", "灵族"];
+            else if(id === 'i_gd') arr = ["男修", "女修", "混沌"];
+            else if(id === 'i_cl') arr = ["凡人", "炼体一层", "炼体巅峰", "筑基初期", "金丹初期", "元婴老怪"];
+            
+            window.currentModalData = arr.map(item => {
+                let name, desc = "", rawVal, t = "", v = "";
+                if (typeof item === 'string') {
+                    rawVal = item;
+                    let m = item.match(/^(.*?)(?:\s*\((.*?)\))?$/); 
+                    name = m ? (m[1] ? m[1].trim() : item) : item;
+                    if(m && m[2]) desc = m[2].trim();
+                } else {
+                    rawVal = item.n; name = item.n; desc = item.d || ""; t = item.t || ""; v = item.v || "";
+                }
+                return { rawVal, name, desc, t, v };
+            });
+
+            let html = '';
+            window.currentModalData.forEach((data, idx) => {
+                let displayDesc = data.desc ? data.desc : (id === 'i_rc' || id === 'i_gd' || id === 'i_cl' || id === 'i_comp_rc' ? "天道基础法则。" : "大道隐蔽，天机未注详名。");
+                let tHtml = data.t ? `<span style="font-size:0.8em;color:#888;margin-left:8px;">[${data.t}]</span>` : '';
+                html += `<div class="comp-item" onclick="window.ConfirmOpt('${id}', ${idx})">
+                            <div class="comp-info">
+                                <div class="comp-name" style="color:var(--accent-red); font-size:1.15em; margin-bottom:4px;">${data.name}${tHtml}</div>
+                                <div class="comp-desc">${displayDesc}</div>
+                            </div>
+                         </div>`;
+            });
+            I('sys_modal_title').innerText = title;
+            I('sys_modal_list').innerHTML = html;
+            I('sys_modal').classList.remove('hidden');
+        };
+
+        window.ConfirmOpt = (id, idx) => {
+            let data = window.currentModalData[idx];
+            let el = I(id);
+            el.value = data.rawVal;
+            el.dataset.n = data.name; el.dataset.d = data.desc; el.dataset.t = data.t; el.dataset.v = data.v;
+
+            I('disp_' + id).innerText = data.name;
+            I('sys_modal').classList.add('hidden');
+            
+            if (id === 'i_rc') RC();
+            if (id === 'i_comp_rc') window.RenderComp();
+            U(); 
+        };
+        window.CloseOpt = () => I('sys_modal').classList.add('hidden');
+        
+        const U=()=>{
+            const n=I('i_nm').value||"无名",a=I('i_ag').value,r=I('i_rc').value;
+            I('v_ag').innerText=a;I('p_av').innerText=n.charAt(0);I('p_nm').innerText=n;
+            I('p_rd').innerText=`${r} · ${a}岁`;
+            I('p_rt').innerText=V('i_rt');I('p_bd').innerText=V('i_bd');
+            I('p_cl').innerText=V('i_cl');I('p_lc').innerText=V('i_lc');
+            I('p_ds').innerText=I('i_ds').value||"暂无描述";
+            const w=I('p_aw');w.className='avatar-w';
+            const rv=V('i_rt'),bv=V('i_bd');
+            if(rv.includes('天')||rv.includes('道')||rv.includes('龙'))w.classList.add('gold');
+            else if(bv.includes('魔')||r==='魔族'||r==='鬼族')w.classList.add('red');
+            else if(rv.includes('灵')||r==='灵族'||r==='妖族')w.classList.add('purple');
+            w.querySelector('.aura').classList.add('on');
+        };
+
+window.RenderComp = () => {
+            const compRace = I('i_comp_rc') ? I('i_comp_rc').value : "人族";
+            const c = DB[compRace] || DB["人族"];
+            const cl = I('comp_root');
+            if (cl) {
+                cl.innerHTML = c.C.map((p, i) => {
+                    let m = p.d.match(/\((T\d|EX)\)$/);
+                    let tier = m ? m[1] : 'T1';
+                    let cleanDesc = p.d.replace(/\s*\((T\d|EX)\)$/, '');
+                    
+                    return `
+                    <div class="comp-item" data-tier="${tier}" onclick="window.SelComp(this, ${i}, '${compRace}')">
+                        <div class="comp-rank">${tier}</div>
+                        <div class="comp-info"><div class="comp-name">${p.n}</div><div class="comp-desc">${cleanDesc}</div></div>
+                        <div class="rel-bar">
+                            ${DB.Global.Rel.R.map(rl=>`<div class="rel-btn" onclick="window.SelRel(event,this,'${rl.v}')">${rl.n}</div>`).join('')}
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+            curComp = null; curRel = null; U();
+        };
+
+const RC=()=>{
+            const r=I('i_rc').value,c=DB[r]||DB["人族"];
+            I('l_rt').innerText=c.L; P('i_rt',c.R); P('i_bd',c.B); P('i_lc',c.P); P('i_it',c.I);
+            I('i_ds').value=c.D[Math.floor(Math.random()*c.D.length)];
+            
+            if(I('i_comp_rc')) {
+                I('i_comp_rc').value = r;
+                if(I('disp_i_comp_rc')) I('disp_i_comp_rc').innerText = r;
+            }
+            window.RenderComp();
+        };
+
+        // 修改选取逻辑，将当前羁绊种族 (compRace) 传入，避免取到错误数组
+        window.SelComp=(el,idx, compRace)=>{
+            document.querySelectorAll('.comp-item').forEach(e=>e.classList.remove('active'));
+            el.classList.add('active');
+            curComp=DB[compRace].C[idx];
+            el.querySelector('.rel-btn').click();
+        };
+        
+        window.SelRel=(e,el,key)=>{
+            e.stopPropagation();
+            document.querySelectorAll('.rel-btn').forEach(b=>b.classList.remove('active'));
+            el.classList.add('active');
+            curRel=DB.Global.Rel.R.find(r=>r.v===key);
+        };
+
+        const RN=()=>{
+            const r=Math.random();let v="人族";
+            if(r>.9)v="灵族";else if(r>.8)v="魔族";else if(r>.7)v="鬼族";else if(r>.5)v="妖族";
+            I('i_rc').value=v; 
+            if(I('disp_i_rc')) I('disp_i_rc').innerText = v;
+            RC();
+            const n=["叶凡","韩立","白小纯","方寒","王林","苏清寒","林动"];
+            I('i_nm').value=n[Math.floor(Math.random()*n.length)];
+            I('i_ag').value=Math.floor(Math.random()*15)+10;U();
+        };
+
+        const SB=()=>{
+            const rich = (id) => {
+                const c = I(id+'_c');
+                if(c && !c.classList.contains('hidden') && c.value) return c.value; 
+                const el = I(id);
+                if(!el) return "未知";
+                
+                let n = el.dataset.n || el.value || "未知";
+                let t = el.dataset.t;
+                let v = el.dataset.v;
+                let d = el.dataset.d;
+
+                let parts = [];
+                if(t && t !== "undefined") parts.push(`t:"${t}"`);
+                if(v && v !== "undefined") parts.push(`v:"${v}"`);
+                if(d && d !== "undefined") parts.push(`d:"${d}"`);
+
+                if(parts.length > 0){
+                    return `${n} {${parts.join(', ')}}`;
+                }
+                return n;
+            };
+
+            let compTxt = "";
+            if (curComp && curRel) {
+                let cParts = [];
+                if(curComp.t) cParts.push(`t:"${curComp.t}"`);
+                if(curComp.d) cParts.push(`d:"${curComp.d}"`);
+                let cStr = cParts.length > 0 ? ` {${cParts.join(', ')}}` : "";
+                
+                let rParts = [];
+                if(curRel.v) rParts.push(`v:"${curRel.v}"`);
+                if(curRel.d) rParts.push(`d:"${curRel.d}"`);
+                let rStr = rParts.length > 0 ? ` {${rParts.join(', ')}}` : "";
+
+                compTxt = `\n- 宿命羁绊：${curComp.n}${cStr}\n- 羁绊纠葛：${curRel.n}${rStr}`;
+            }
+
+            const t=`【大荒志·角色档案】
+- 当前世界：复苏历19021年5月5日
+- 真名：${I('i_nm').value} (${I('i_gd').value}, ${I('i_ag').value}岁)
+- 血脉：${I('i_rc').value}
+- 修为：${I('i_cl').value}
+- 天命：${rich('i_lk')}
+- 降生地：${rich('i_lc')}
+
+【造化与外物】
+- 天赋：${rich('i_rt')}
+- 体质：${rich('i_bd')}
+- 随身法宝：${rich('i_it')}${compTxt}
+
+【前尘旧梦】
+> ${I('i_ds').value}
+
+请根据以上设定，为我描写这个角色在大荒世界苏醒的第一幕。`;
+            try {
+                // 1. 先尝试寻找当前页面的输入框
+                let tavernTextarea = document.getElementById('send_textarea');
+                
+                // 2. 尝试寻找父页面(酒馆)的输入框。必须单独用 try-catch 包裹，防止跨域报错直接崩掉整个函数
+                if (!tavernTextarea && window.parent) {
+                    try {
+                        tavernTextarea = window.parent.document.getElementById('send_textarea');
+                    } catch (crossError) {
+                        console.warn("无法跨域访问酒馆父页面，准备回退到剪贴板模式", crossError);
+                    }
+                }
+
+                // 3. 判断是否成功找到了输入框
+                if (tavernTextarea) {
+                    tavernTextarea.value = t;
+                    tavernTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+                    
+                    const b = I('b_go');
+                    b.innerHTML = '已携天道词条入世 (已自动填入)';
+                    b.style.background = '#8a1010'; 
+                    b.style.color = '#fff';
+                    setTimeout(() => {
+                        b.innerHTML = '以此身入世';
+                        b.style.background = ''; 
+                        b.style.color = '';
+                    }, 3000);
+                } else {
+                    // 4. 保底机制：如果没找到输入框（或者跨域被拦），则尝试复制到剪贴板
+                    // 必须先检查 navigator.clipboard 是否存在（酒馆内嵌时可能没有剪贴板权限）
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(t).then(() => {
+                            const b = I('b_go');
+                            b.innerHTML = '已成功复制到剪贴板';
+                            b.style.background = '#8a1010'; 
+                            b.style.color = '#fff';
+                            setTimeout(() => { 
+                                b.innerHTML = '以此身入世'; 
+                                b.style.background = ''; 
+                                b.style.color = ''; 
+                            }, 3000);
+                        }).catch(err => {
+                            console.error("剪贴板写入失败:", err);
+                            alert("剪贴板写入失败，请手动复制此内容：\n\n" + t);
+                        });
+                    } else {
+                        // 5. 终极保底：连剪贴板 API 都不支持时，弹窗让用户手动复制
+                        alert("当前环境不支持自动填入和复制，请手动复制以下设定：\n\n" + t);
+                    }
+                }
+            } catch (e) {
+                console.error("发送时发生严重错误:", e);
+                alert("生成设定时发生错误，请按 F12 查看控制台！");
+            }
+        };
+
+        window.RN = RN;
+        window.SB = SB;
+
+        window.navStep = (step) => {
+            document.querySelectorAll('.step-content').forEach((el, i) => {
+                if (i + 1 === step) { el.classList.add('active'); el.classList.remove('hidden'); } 
+                else { el.classList.remove('active'); el.classList.add('hidden'); }
+            });
+            document.querySelectorAll('.step-dot').forEach((el, i) => { el.classList.toggle('active', i + 1 === step); });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        I('i_rc').onchange=RC;
+        I('i_nm').oninput=U;
+        I('i_ag').oninput=()=>{I('v_ag').innerText=I('i_ag').value;U()};
+        
+        document.querySelectorAll('.btn-edit').forEach(b=>{
+            b.onclick=function(){
+                const i=this.dataset.t,s=I('disp_'+i)||I(i),c=I(i+'_c');
+                if(c.classList.contains('hidden')){
+                    s.classList.add('hidden');c.classList.remove('hidden');this.classList.add('on');c.focus()
+                }else{
+                    c.classList.add('hidden');s.classList.remove('hidden');this.classList.remove('on');U()
+                }
+            }
+        });
+        
+        // 执行初始法则注入
+        P('i_lk', DB.Global.Luck);
+        RC();
+
+        // 开场动画逻辑
+        const introTexts = [
+            "真作假时假亦真，幻景之内藏大千。", "虚妄蔽眼，何处觅真我？", "谎言若能欺天，便是无上大道。", 
+            "以假修真，真假同源。", "善恶同源皆是相，一念浮沉定乾坤。", "若这天道不公，我便修魔荡平天界。", 
+            "杀一人为罪，屠万人为雄，灭万魔为尊。", "大道无情，然七情六欲岂是樊笼？", 
+            "顺为凡，逆则仙，只在中间颠倒颠。", "欲求长生，先历死劫。"
+        ];
+        const introDiv = I('intro');
+        
+        const spawnQuote = () => {
+            if (!introDiv || introDiv.classList.contains('out')) return;
+            const quote = document.createElement('div');
+            quote.className = 'float-quote';
+            quote.innerText = introTexts[Math.floor(Math.random() * introTexts.length)];
+            
+            let top = 15 + Math.random() * 70; 
+            let left = 10 + Math.random() * 60;
+            if (top > 40 && top < 60) top = 20; 
+            if (left > 40 && left < 60) left = 20;
+            
+            quote.style.top = top + '%'; quote.style.left = left + '%';
+            quote.style.transform = `scale(${0.8 + Math.random() * 0.4})`;
+            introDiv.appendChild(quote);
+            setTimeout(() => { if (quote.parentNode) quote.parentNode.removeChild(quote); }, 3500);
+        };
+
+        spawnQuote(); setTimeout(spawnQuote, 500);
+        const spawnInterval = setInterval(spawnQuote, 1000);
+
+        let introCleared = false;
+        const clearIntro = () => {
+            if (introCleared) return;
+            introCleared = true;
+            if (typeof spawnInterval !== 'undefined') clearInterval(spawnInterval);
+            if (introDiv) introDiv.classList.add('out');
+            setTimeout(() => { 
+                const mainUI = I('ui-main');
+                if (mainUI) mainUI.classList.add('show'); 
+            }, 800);
+        };
+
+        introDiv.addEventListener('click', clearIntro);
+        setTimeout(clearIntro, 3500);
+
+    } catch (error) {
+        console.error("代码运行崩溃:", error);
+        throw error; // 向上抛出，触发天道巡查阵(红色监控面板)
+    }
+})();
+</script>
+</body>
+</html>
