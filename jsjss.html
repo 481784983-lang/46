@@ -1,0 +1,2053 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>太玄真本 · 大荒志</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts-d-gstatic-d-com-s-gmn.d.tuangouai.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;500;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+:root {
+    /* ---【太玄真本·传世色板】--- */
+    --bg-paper: #f0ede5;        /* 沉淀感更重的熟宣纸色 */
+    --bg-card: rgba(252, 250, 245, 0.7); /* 仿羊脂玉微透质感 */
+    
+    /* 东方五色 */
+    --ink-main: #111418;        /* 极深玄色，主标题 */
+    --ink: #2c3437;             /* 苍色，正文 */
+    --gold: #b38b4d;            /* 暗鎏金，更显贵气 */
+    --vermilion: #8e281f;       /* 沉朱砂，非明红 */
+    --cyan: #3b5f60;            /* 深黛翠 */
+    --purple: #4c3654;          /* 暗绛紫 */
+    --sub: #828e90;             /* 淡墨色 */
+
+    --font-title: 'Ma Shan Zheng', cursive;
+    --font-body: 'Noto Serif SC', serif;
+}
+
+* { 
+    box-sizing: border-box; user-select: none; 
+    -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; 
+}
+
+body {
+    width: 100%; min-height: 100vh;
+    padding: 20px 0;
+    display: flex; justify-content: center; align-items: center;
+    /* 极暗流云纹理虚空动态背景，完美衬托高阶画卷发光 */
+    background: linear-gradient(135deg, #0a0c0f 0%, #1a1e24 50%, #0a0c0f 100%);
+    background-size: 200% 200%;
+    animation: void-flow 15s ease-in-out infinite;
+    font-family: var(--font-body); color: var(--ink);
+    /* 将防回弹法则移至此处，仅约束大世界边缘 */
+    overscroll-behavior: none; 
+}
+
+/* === 主容器：画卷化 === */
+.wrapper {
+    position: relative; 
+    width: 100%; 
+    max-width: 480px; 
+    height: 95vh; 
+    background-color: var(--bg-paper);
+    border-radius: 4px; 
+    animation: breath-glow 4s ease-in-out infinite;
+    display: flex; flex-direction: column; overflow: hidden;
+}
+
+/* 新增：独立的纸张纹理层，锁死重绘 */
+.wrapper-texture {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background-image: 
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.4) 0%, transparent 60%),
+        url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23a)' opacity='0.06'/%3E%3C/svg%3E");
+    will-change: transform;
+}
+
+/* 画卷四角的鎏金角花 */
+.wrapper::before, .wrapper::after {
+    content: ''; position: absolute; width: 40px; height: 40px;
+    border: 2px solid var(--gold); opacity: 0.4; pointer-events: none; z-index: 99;
+}
+.wrapper::before { top: 15px; left: 15px; border-right: none; border-bottom: none; }
+.wrapper::after { bottom: 85px; right: 15px; border-left: none; border-top: none; }
+
+.wrapper.combat { box-shadow: 0 0 50px rgba(142, 40, 31, 0.4), inset 0 0 0 3px rgba(142, 40, 31, 0.3); }
+
+/* === 顶部：古典碑铭排版 === */
+.header {
+    padding: 40px 20px 20px; 
+    display: flex; flex-direction: column; align-items: center; 
+    position: relative; z-index: 2; flex-shrink: 0;
+}
+.header::after { /* 卷首渐变分割线 */
+    content: ''; position: absolute; bottom: 0; left: 15%; width: 70%; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(179,139,77,0.5), transparent);
+}
+
+#ui-loc {
+    font-family: var(--font-title); font-size: 3rem; color: var(--ink-main);
+    line-height: 1.1; letter-spacing: 8px; margin-bottom: 12px; text-align: center;
+    text-shadow: 2px 4px 10px rgba(0,0,0,0.08);
+}
+
+.status-group { text-align: center; width: 100%; }
+
+/* 时间：金石之音 */
+#ui-time { 
+    font-size: 0.85rem; color: var(--gold); letter-spacing: 4px; 
+    font-weight: 700; margin-bottom: 16px; 
+}
+
+/* 去除药丸感，采用古籍引文式环境状态 */
+.pill-box { 
+    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; 
+    margin-bottom: 4px; font-size: 0.8rem; color: var(--sub);
+}
+.pill { background: transparent; border: none; padding: 0; color: var(--ink); }
+.pill:not(:last-child)::after { 
+    content: '｜'; margin-left: 12px; color: rgba(179,139,77,0.4); font-size: 0.7rem; 
+}
+
+/* === 内容区 === */
+.content { 
+    flex: 1; 
+    overflow-y: auto; 
+    padding: 10px 24px 60px; 
+    scrollbar-width: none; 
+    -webkit-overflow-scrolling: touch; 
+    position: relative;
+    z-index: 1;
+    /* ✅ 改为 auto：允许内部滑动到底部/顶部时，将滑动事件传递给外层父级容器 */
+    overscroll-behavior-y: auto; 
+}
+.content::-webkit-scrollbar { display: none; }
+/* === 底部导航：轻量毛玻璃 === */
+.navbar {
+    height: 76px; 
+    background: linear-gradient(to top, rgba(240,237,229,1), rgba(240,237,229,0.8));
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    display: flex; justify-content: space-around; align-items: center; 
+    padding: 0 10px; border-top: 1px solid rgba(179,139,77,0.2);
+    z-index: 100; flex-shrink: 0;
+}
+.nav-btn {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; height: 100%; flex: 1;
+    font-size: 0.75rem; color: rgba(130,142,144,0.6); cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.nav-btn i { font-size: 1.3rem; transition: transform 0.3s; }
+.nav-btn.active { color: var(--ink-main); }
+.nav-btn.active i { transform: translateY(-3px) scale(1.15); color: var(--gold); }
+.nav-btn.active::after {
+    content: ''; position: absolute; bottom: 10px; width: 16px; height: 2px; 
+    background: var(--gold); border-radius: 2px;
+}
+
+/* === 通用组件：雅致重构 === */
+/* 标题左侧金线改为卷轴祥云纹理感 */
+.sec-title {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 1.05rem; font-weight: 700; color: var(--ink-main);
+    margin: 36px 0 16px; padding-left: 0;
+    position: relative; line-height: 1; letter-spacing: 1px;
+}
+.sec-title::before {
+    content: '◈'; color: var(--gold); font-size: 0.8rem;
+}
+
+/* 卡片摒弃白底圆角，采用玉简形态 */
+.card {
+    /* 极致性能：移除长列表的 backdrop-filter，略微调高 alpha 值伪造透光感 */
+    background: linear-gradient(135deg, rgba(252, 250, 245, 0.98) 0%, rgba(245, 240, 230, 0.98) 100%); 
+    border: 1px solid rgba(179, 139, 77, 0.2);
+    border-radius: 4px;
+    padding: 18px; 
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); 
+    position: relative;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease; 
+}
+
+/* 悬浮交互微调 */
+.card.npc-clickable:active {
+    transform: scale(0.98);
+    background: linear-gradient(135deg, rgba(240, 235, 225, 0.95) 0%, rgba(235, 225, 210, 1) 100%);
+}
+/* 给卡片增加一个极细的内发光，模拟玉石质感 */
+.card::before {
+    content: ''; position: absolute; inset: 0;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    pointer-events: none;
+}
+
+.data-grid { display: grid; gap: 16px 12px; }
+.g-2 { grid-template-columns: 1fr 1fr; }
+.g-3 { grid-template-columns: repeat(3, 1fr); }
+.g-4 { grid-template-columns: repeat(4, 1fr); }
+.g-5 { grid-template-columns: repeat(5, 1fr); }
+
+/* 阵法化玉简 KV 属性 */
+.kv-box { 
+    text-align: center; display: flex; flex-direction: column; align-items: center; 
+    background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 100%);
+    border: 1px solid rgba(179,139,77,0.15); border-radius: 4px; padding: 10px 4px;
+    position: relative; overflow: hidden;
+}
+.kv-box::after { /* 底部法阵微光 */
+    content: ''; position: absolute; bottom: 0; left: 20%; width: 60%; height: 2px;
+    background: currentColor; box-shadow: 0 -2px 10px currentColor; opacity: 0.3;
+}
+.kv-k { font-size: 0.65rem; color: var(--sub); margin-bottom: 8px; letter-spacing: 2px; font-family: var(--font-title); }
+.kv-v { font-size: 1rem; font-weight: 700; color: var(--ink-main); text-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+/* 剑意灵脉进度条 (结丹重构) */
+.prog-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.prog-lbl { width: 36px; font-size: 0.85rem; color: var(--ink); text-align: right; font-family: var(--font-title); letter-spacing: 1px; }
+.prog-track { flex: 1; height: 3px; background: rgba(0,0,0,0.06); position: relative; border-radius: 2px; }
+.prog-bar { 
+    height: 100%; position: relative; 
+    background: linear-gradient(90deg, transparent, currentColor);
+    box-shadow: 0 0 10px currentColor; 
+    transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.prog-bar::after { /* 剑锋吞吐高光 */
+    content: ''; position: absolute; right: -2px; top: -3px; 
+    width: 4px; height: 9px; background: #fff;
+    box-shadow: 0 0 8px currentColor, 0 0 4px #fff;
+    transform: skewX(-30deg); /* 倾斜出剑气感 */
+}
+.prog-val { width: 36px; font-size: 0.75rem; color: var(--ink-main); text-align: right; font-family: monospace; font-weight: bold; }
+
+/* 列表项水墨线 */
+.list-item { display: flex; align-items: center; gap: 16px; padding: 16px 0; position: relative; }
+.list-item::after {
+    content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(179,139,77,0.2), transparent);
+}
+.list-item:last-child { padding-bottom: 0; }
+.list-item:last-child::after { display: none; }
+.item-icon {
+    width: 42px; height: 42px; border-radius: 4px;
+    background: transparent; border: 1px solid rgba(179,139,77,0.3); color: var(--gold);
+    display: grid; place-items: center; font-size: 1.2rem; flex-shrink: 0;
+    transform: rotate(45deg); /* 菱形图标框 */
+}
+.item-icon i { transform: rotate(-45deg); } /* 图标回正 */
+.item-main { flex: 1; overflow: hidden; }
+.item-title { font-size: 1rem; font-weight: 700; color: var(--ink-main); display: flex; justify-content: space-between; align-items: baseline; }
+.item-sub { font-size: 0.75rem; color: var(--sub); margin-top: 4px; line-height: 1.5; }
+
+.seal {
+    min-width: 64px; width: auto; max-width: 80px; /* 允许变宽但有上限 */
+    min-height: 64px;
+    padding: 4px; box-sizing: border-box;
+    border: 3px double var(--vermilion); 
+    display: flex; justify-content: center; align-items: center; flex-wrap: wrap; text-align: center;
+    font-family: var(--font-title); font-size: 1.8rem; line-height: 1.1;
+    color: var(--vermilion); 
+    background: rgba(142, 40, 31, 0.05); 
+    transform: rotate(-3deg); 
+    box-shadow: 2px 2px 0 rgba(142, 40, 31, 0.1);
+    flex-shrink: 0;
+    word-break: break-all; /* 允许文字换行 */
+}
+
+/* === 标签去背景化，采用古文括弧 === */
+.tag { 
+    display: inline-block; font-size: 0.75rem; vertical-align: middle; 
+    margin: 0 2px; color: var(--sub); font-weight: bold;
+}
+.tag::before { content: '「'; opacity: 0.5; margin-right: 2px; }
+.tag::after { content: '」'; opacity: 0.5; margin-left: 2px; }
+
+.t-gold { color: var(--gold); }
+.t-cyan { color: var(--cyan); }
+.t-red { color: var(--vermilion); }
+.t-purple { color: var(--purple); }
+.t-outline { color: var(--sub); font-weight: normal; }
+
+/* === 命谱卷宗 (模态框) === */
+    .modal {
+        position: absolute; inset: 0; background: rgba(10, 12, 15, 0.8); z-index: 200;
+        display: flex; align-items: flex-end; opacity: 0; pointer-events: none; 
+        /* 性能锁定：绝对禁止 all 过渡，只过渡透明度 */
+        transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        will-change: opacity;
+    }
+    .modal.show { opacity: 1; pointer-events: auto; }
+    
+    .m-card {
+        width: 100%; height: 88%; background: var(--bg-paper);
+        border-radius: 2px 2px 0 0; 
+        box-shadow: 0 -15px 50px rgba(0,0,0,0.6);
+        display: flex; flex-direction: column;
+        position: relative; 
+        /* 初始状态：略微下沉且透明 */
+        opacity: 0; 
+        transform: translateY(20px);
+        transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: transform, opacity;
+    }
+    .modal.show .m-card { transform: translateY(0); opacity: 1; }
+    
+    /* 卷宗顶栏：去现代感 */
+    .m-head { 
+        padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; 
+        background: linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0));
+        border-bottom: 2px solid var(--gold); flex-shrink: 0; 
+    }
+    .m-head-title { font-family: var(--font-title); font-size: 1.5rem; letter-spacing: 4px; }
+    .m-close { 
+        font-size: 0.85rem; color: var(--sub); cursor: pointer; 
+        border: 1px solid rgba(179,139,77,0.4); padding: 4px 12px; border-radius: 2px;
+        transition: 0.3s;
+    }
+    .m-close:active { background: var(--gold); color: #fff; }
+    
+    .m-body { flex: 1; overflow-y: auto; padding: 0 0 40px 0; scrollbar-width: none; }
+    
+    /* 卷宗内部排版组件 */
+    .m-banner {
+        padding: 30px 24px 20px; display: flex; gap: 20px; align-items: center;
+        position: relative;
+    }
+    .m-banner::after { /* 渐变底纹 */
+        content: ''; position: absolute; inset: 0; 
+        background: linear-gradient(180deg, rgba(179,139,77,0.1) 0%, transparent 100%); pointer-events: none;
+    }
+    .m-quote { 
+        padding: 16px 24px; font-style: italic; color: var(--sub); font-size: 0.85rem; line-height: 1.6;
+        background: rgba(0,0,0,0.02); border-top: 1px dashed rgba(0,0,0,0.06); border-bottom: 1px dashed rgba(0,0,0,0.06);
+        text-align: center;
+    }
+    
+    /* 古籍段落分割 */
+    .m-section { padding: 24px; position: relative; }
+    .m-sec-title { 
+        font-size: 1rem; font-weight: 700; color: var(--ink-main); margin-bottom: 20px; 
+        display: flex; align-items: center; gap: 8px; font-family: var(--font-title); letter-spacing: 2px;
+    }
+    .m-sec-title::before, .m-sec-title::after { 
+        content: ''; height: 1px; flex: 1; background: linear-gradient(90deg, transparent, rgba(179,139,77,0.4), transparent); 
+    }
+    
+    /* 核心属性表格：仿古籍排版 */
+    .m-table { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 8px; }
+    .m-td { display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .m-td-k { font-size: 0.65rem; color: var(--sub); margin-bottom: 4px; }
+    .m-td-v { font-size: 0.9rem; color: var(--ink); font-weight: 700; }
+    /* === 阴阳秘录 (私密信息极简特化排版) === */
+    .yy-box {
+        margin: 16px 0 0 0; padding: 20px 16px;
+        background: radial-gradient(circle at 50% 0%, rgba(142,40,31,0.04), rgba(92,67,102,0.02));
+        border: 1px solid rgba(142,40,31,0.15); border-radius: 4px; position: relative;
+    }
+    /* 四角残破古阵纹 */
+    .yy-box::before, .yy-box::after {
+        content: ''; position: absolute; width: 12px; height: 12px; border: 1px solid rgba(142,40,31,0.3); pointer-events: none;
+    }
+    .yy-box::before { top: 4px; left: 4px; border-right: none; border-bottom: none; }
+    .yy-box::after { bottom: 4px; right: 4px; border-left: none; border-top: none; }
+
+    /* 秘录大标题 */
+    .yy-title {
+        text-align: center; color: var(--vermilion); font-family: var(--font-title); font-size: 1.1rem;
+        letter-spacing: 4px; margin-bottom: 20px; display: flex; justify-content: center; align-items: center; gap: 10px;
+    }
+    .yy-title::before, .yy-title::after { content: ''; height: 1px; width: 30px; background: linear-gradient(90deg, transparent, rgba(142,40,31,0.5), transparent); }
+
+    /* 元阴与合欢的双玉牌 (紧凑) */
+    .yy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .yy-plate {
+        text-align: center; padding: 8px 0; background: rgba(255,255,255,0.4);
+        border: 1px dashed rgba(142,40,31,0.2); border-radius: 2px;
+    }
+    .yy-plate-lbl { font-size: 0.65rem; color: var(--sub); margin-bottom: 2px; letter-spacing: 1px; }
+    .yy-plate-val { font-size: 0.9rem; font-weight: bold; }
+
+    /* 孕育：造化之脉 (单行极简) */
+    .yy-preg {
+        display: flex; justify-content: space-between; align-items: center; padding: 8px 12px;
+        background: linear-gradient(90deg, transparent, rgba(142,40,31,0.05), transparent);
+        border-top: 1px solid rgba(142,40,31,0.1); border-bottom: 1px solid rgba(142,40,31,0.1);
+        margin-bottom: 16px;
+    }
+    .yy-preg-lbl { font-size: 0.75rem; color: var(--ink-main); font-weight: bold; }
+    .yy-preg-lbl::before { content:'❀'; color:var(--vermilion); margin-right:6px; font-size:0.6rem; }
+    .yy-preg-val { font-size: 0.8rem; color: var(--vermilion); font-weight: bold; }
+
+    /* 并列的双栏：XP 与 敏感度 */
+    .yy-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .yy-sub-title { font-size: 0.7rem; color: var(--purple); font-weight: bold; margin-bottom: 8px; border-bottom: 1px dashed rgba(92,67,102,0.2); padding-bottom: 4px; }
+    
+    /* 敏感度：极细发光灵力线 */
+    .yy-sens-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+    .yy-sens-lbl { width: 32px; font-size: 0.65rem; color: var(--ink); text-align: right; }
+    .yy-sens-track { flex: 1; height: 1px; background: rgba(0,0,0,0.05); position: relative; }
+    .yy-sens-bar { position: absolute; left: 0; top: -1px; height: 3px; background: var(--purple); box-shadow: 0 0 4px rgba(92,67,102,0.6); }
+    .yy-sens-val { width: 22px; font-size: 0.6rem; color: var(--sub); text-align: right; font-family: monospace; }
+    
+    /* XP：小巧符箓标签 */
+    .yy-xp-tag {
+        display: inline-block; padding: 2px 4px; font-size: 0.6rem; margin: 0 4px 4px 0;
+        background: rgba(142,40,31,0.05); border: 1px solid rgba(142,40,31,0.2); color: var(--vermilion); border-radius: 2px;
+    }
+
+    /* 肉身辛密：辞典式高度紧缩版 */
+    .yy-body-box { background: rgba(255,255,255,0.3); padding: 10px; border: 1px solid rgba(179,139,77,0.2); border-radius: 2px; }
+    .yy-body-row { margin-bottom: 8px; }
+    .yy-body-row:last-child { margin-bottom: 0; }
+    .yy-body-k { font-size: 0.7rem; color: var(--sub); }
+    .yy-body-k::before { content:'「'; opacity:0.5; }
+    .yy-body-k::after { content:'」'; opacity:0.5; }
+    .yy-body-v { font-size: 0.75rem; color: var(--gold); font-weight: bold; margin-left: 2px; }
+    .yy-body-desc { 
+        font-size: 0.65rem; color: var(--ink); line-height: 1.5; text-align: justify;
+        padding-left: 8px; border-left: 1px solid rgba(179,139,77,0.3); margin-top: 3px; 
+    }
+
+    /* 辅助颜色 */
+    .c-gold { color: var(--gold); }
+    .c-red { color: var(--vermilion); }
+    .c-cyan { color: var(--cyan); }
+    .c-purple { color: var(--purple); }
+    /* === 背包专属样式 === */
+.bag-cates { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; scrollbar-width: none; }
+.bag-cates::-webkit-scrollbar { display: none; }
+.bag-cate-btn { padding: 4px 12px; font-size: 0.75rem; border: 1px solid rgba(179,139,77,0.3); border-radius: 12px; color: var(--sub); cursor: pointer; white-space: nowrap; transition: 0.3s; }
+.bag-cate-btn.active { background: var(--gold); color: #fff; border-color: var(--gold); box-shadow: 0 2px 6px rgba(179,139,77,0.3); }
+
+.bag-item-details { width: 100%; border-bottom: 1px dashed rgba(179,139,77,0.2); }
+.bag-item-details:last-child { border-bottom: none; }
+.bag-item-summary { display: flex; align-items: center; gap: 12px; padding: 12px 0; cursor: pointer; list-style: none; }
+.bag-item-summary::-webkit-details-marker { display: none; } /* 隐藏原生箭头 */
+.bag-item-summary:active { background: rgba(0,0,0,0.02); }
+.item-desc-box { padding: 0 12px 16px 54px; font-size: 0.75rem; color: var(--ink); line-height: 1.6; display: none; border-left: 2px solid rgba(179,139,77,0.1); margin-left: 20px; }
+.bag-item-details[open] .item-desc-box { display: block; animation: ink-fade 0.3s ease; }
+.bag-item-details[open] .bag-expand-icon { transform: rotate(90deg); color: var(--gold); }
+.bag-expand-icon { color: var(--sub); font-size: 0.6rem; transition: transform 0.3s; margin-left: auto; }
+
+.pagination { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(179,139,77,0.1); font-size: 0.8rem; font-family: var(--font-title); letter-spacing: 1px;}
+.page-btn { padding: 4px 12px; border: 1px solid rgba(179,139,77,0.3); border-radius: 4px; color: var(--gold); cursor: pointer; transition: 0.3s;}
+.page-btn:active { background: var(--gold); color: #fff; }
+.page-btn.disabled { opacity: 0.3; pointer-events: none; border-style: dashed;}
+    /* === 仙侠动效与微调 (新增) === */
+@keyframes breath-glow {
+    0% { box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(179, 139, 77, 0.2); }
+    50% { box-shadow: 0 20px 60px rgba(179, 139, 77, 0.15), inset 0 0 12px rgba(179, 139, 77, 0.5); }
+    100% { box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(179, 139, 77, 0.2); }
+}
+
+@keyframes void-flow {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+/* 古风图腾基类 */
+.icon-gf { 
+    font-style: normal; font-size: 1.4rem; line-height: 1; 
+    font-family: 'Noto Serif SC', serif; /* 借用宋体展示符号更优雅 */
+    font-weight: 300; transition: all 0.3s;
+}
+.sec-title .icon-gf { font-size: 1.1rem; color: var(--gold); margin-right: 4px; }
+/* === 剑光水墨转场 (平滑性能版) === */
+@keyframes ink-fade {
+    0% { opacity: 0; transform: translateY(15px) scale(0.98); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.view-transition {
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+.view-hidden {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+    pointer-events: none;
+}
+
+/* === 境界华丽度专属体系 (14阶渐进定制) === */
+.tier-card { 
+    position: relative; overflow: hidden; transition: box-shadow 0.3s, transform 0.2s; 
+    /* 仙人断腕法则：绝对禁止列表中的卡片播放呼吸动画，挽救 90% 的 GPU 算力！ */
+    animation: none !important; 
+}
+.m-card.tier-modal { transition: box-shadow 0.4s ease; }
+.tier-decor { position: absolute; pointer-events: none; z-index: 1; }
+
+/* === 【第一套：红尘破道篇 (引气 -> 渡劫)】 === */
+/* 0. 引气 */
+.tier-0 { border-color: rgba(179,139,77,0.15); }
+/* 1. 炼体 */
+.tier-1 { border-color: rgba(179,139,77,0.3); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.03); }
+/* 2. 筑基 */
+.tier-2 { border-color: var(--cyan); box-shadow: 0 2px 8px rgba(59,95,96,0.1); }
+/* 3. 金丹 */
+.tier-3 { border: 1px solid var(--gold); box-shadow: 0 2px 12px rgba(179,139,77,0.2), inset 0 0 6px rgba(179,139,77,0.1); }
+/* 4. 元婴 */
+.tier-4 { border: 2px double var(--gold); background: linear-gradient(135deg, rgba(252,250,245,0.95), rgba(245,240,230,0.9)); box-shadow: 0 4px 15px rgba(179,139,77,0.25), inset 0 0 10px rgba(179,139,77,0.15); }
+/* 5. 化神 */
+.tier-5 { border: 2px solid var(--purple); background: linear-gradient(135deg, rgba(252,250,245,0.95), rgba(235,225,240,0.85)); box-shadow: 0 4px 20px rgba(76,54,84,0.2), inset 0 0 12px rgba(76,54,84,0.15); }
+/* 6. 合体 */
+.tier-6 { border: 2px solid var(--gold); background: linear-gradient(135deg, rgba(252,250,245,0.95), rgba(240,230,205,0.9)); box-shadow: 0 4px 25px rgba(179,139,77,0.3), inset 0 0 15px rgba(179,139,77,0.3); }
+/* 7. 大乘 */
+.tier-7 { 
+    border: 2px dashed var(--gold); 
+    /* 增加底色垫底 */
+    background: radial-gradient(circle at 100% 0%, rgba(179,139,77,0.2), transparent 60%), var(--bg-paper); 
+    box-shadow: 0 0 25px rgba(179,139,77,0.4), inset 0 0 20px rgba(179,139,77,0.3); 
+}
+
+/* 8. 渡劫 */
+.tier-8 { 
+    border: 2px solid var(--vermilion); 
+    /* 增加底色垫底，利用多重背景防止透明 */
+    background: linear-gradient(135deg, rgba(252,250,245,0.95), rgba(142,40,31,0.08)), var(--bg-paper); 
+    box-shadow: 0 0 30px rgba(142,40,31,0.4), inset 0 0 25px rgba(142,40,31,0.3); 
+    animation: tier-breath-red 3s infinite alternate ease-in-out; 
+}
+
+/* 11. 仙王 */
+.tier-11 { 
+    border: 2px solid var(--gold); 
+    background: linear-gradient(135deg, rgba(255,253,245,0.98), rgba(255,225,100,0.2)), var(--bg-paper); 
+    box-shadow: 0 0 40px rgba(255,215,0,0.4), inset 0 0 30px rgba(255,215,0,0.25); 
+}
+
+/* 12. 仙帝 (因为有双层 clip-box，建议直接改纯色底防透) */
+.tier-12 { 
+    border: 2px solid transparent; 
+    background: linear-gradient(135deg, rgba(255,250,240,1), rgba(250,230,225,1)) padding-box, 
+                linear-gradient(135deg, var(--gold), var(--vermilion), var(--gold)) border-box; 
+    box-shadow: 0 0 45px rgba(255,215,0,0.6), inset 0 0 35px rgba(142,40,31,0.2); 
+    animation: tier-breath-gold 2.5s infinite alternate; 
+}
+
+/* 13. 圣人 */
+.tier-13 { 
+    border: 2px solid transparent; 
+    background: linear-gradient(135deg, rgba(255,250,255,1), rgba(240,230,255,1)) padding-box, 
+                linear-gradient(45deg, #ff5e62, #ff9966, #ff00ff, #00ffff) border-box; 
+    box-shadow: 0 0 60px rgba(180,100,255,0.6), inset 0 0 40px rgba(255,255,255,0.8); 
+    animation: tier-rainbow-breath 4s infinite linear; 
+}/* 7. 大乘 */
+.tier-7 { 
+    border: 2px dashed var(--gold); 
+    /* 增加底色垫底 */
+    background: radial-gradient(circle at 100% 0%, rgba(179,139,77,0.2), transparent 60%), var(--bg-paper); 
+    box-shadow: 0 0 25px rgba(179,139,77,0.4), inset 0 0 20px rgba(179,139,77,0.3); 
+}
+
+/* 8. 渡劫 */
+.tier-8 { 
+    border: 2px solid var(--vermilion); 
+    /* 增加底色垫底，利用多重背景防止透明 */
+    background: linear-gradient(135deg, rgba(252,250,245,0.95), rgba(142,40,31,0.08)), var(--bg-paper); 
+    box-shadow: 0 0 30px rgba(142,40,31,0.4), inset 0 0 25px rgba(142,40,31,0.3); 
+    animation: tier-breath-red 3s infinite alternate ease-in-out; 
+}
+
+/* 11. 仙王 */
+.tier-11 { 
+    border: 2px solid var(--gold); 
+    background: linear-gradient(135deg, rgba(255,253,245,0.98), rgba(255,225,100,0.2)), var(--bg-paper); 
+    box-shadow: 0 0 40px rgba(255,215,0,0.4), inset 0 0 30px rgba(255,215,0,0.25); 
+}
+
+/* 12. 仙帝 (因为有双层 clip-box，建议直接改纯色底防透) */
+.tier-12 { 
+    border: 2px solid transparent; 
+    background: linear-gradient(135deg, rgba(255,250,240,1), rgba(250,230,225,1)) padding-box, 
+                linear-gradient(135deg, var(--gold), var(--vermilion), var(--gold)) border-box; 
+    box-shadow: 0 0 45px rgba(255,215,0,0.6), inset 0 0 35px rgba(142,40,31,0.2); 
+    animation: tier-breath-gold 2.5s infinite alternate; 
+}
+
+/* 13. 圣人 */
+.tier-13 { 
+    border: 2px solid transparent; 
+    background: linear-gradient(135deg, rgba(255,250,255,1), rgba(240,230,255,1)) padding-box, 
+                linear-gradient(45deg, #ff5e62, #ff9966, #ff00ff, #00ffff) border-box; 
+    box-shadow: 0 0 60px rgba(180,100,255,0.6), inset 0 0 40px rgba(255,255,255,0.8); 
+    animation: tier-rainbow-breath 4s infinite linear; 
+}
+@keyframes tier-breath-red {
+    0% { box-shadow: 0 0 20px rgba(142,40,31,0.3), inset 0 0 15px rgba(142,40,31,0.2); }
+    100% { box-shadow: 0 0 40px rgba(142,40,31,0.6), inset 0 0 30px rgba(142,40,31,0.4); border-color: #ff4d4d; }
+}
+@keyframes tier-breath-gold {
+    0% { box-shadow: 0 0 30px rgba(255,215,0,0.4), inset 0 0 20px rgba(179,139,77,0.2); }
+    100% { box-shadow: 0 0 50px rgba(255,215,0,0.8), inset 0 0 40px rgba(255,215,0,0.4); }
+}
+@keyframes tier-rainbow-breath {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+}
+
+/* === 小宅仙面板华丽度专属体系 (8阶神格蜕变) === */
+.zx-card { position: relative; overflow: hidden; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.zx-decor { position: absolute; pointer-events: none; z-index: 1; }
+
+/* 0阶 (未苏醒/初生)：幽暗沉睡感 */
+.zx-tier-0 { border-color: rgba(130,142,144,0.4); background: linear-gradient(180deg, rgba(240,237,229,0.9) 0%, rgba(220,215,205,0.95) 100%); box-shadow: inset 0 0 10px rgba(0,0,0,0.05); }
+/* 1阶：微光初现 */
+.zx-tier-1 { border-color: rgba(179,139,77,0.4); background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(245,240,230,0.95) 100%); box-shadow: 0 0 10px rgba(179,139,77,0.1), inset 0 0 8px rgba(179,139,77,0.1); }
+/* 2阶：灵力汇聚 */
+.zx-tier-2 { border: 1px solid var(--cyan); background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(235,245,245,0.95) 100%); box-shadow: 0 0 15px rgba(59,95,96,0.2), inset 0 0 10px rgba(59,95,96,0.15); }
+/* 3阶：金纹交织 */
+.zx-tier-3 { border: 2px solid var(--gold); background: linear-gradient(180deg, rgba(255,253,248,0.98) 0%, rgba(250,240,220,0.95) 100%); box-shadow: 0 0 20px rgba(179,139,77,0.3), inset 0 0 15px rgba(179,139,77,0.2); }
+/* 4阶：紫气东来 */
+.zx-tier-4 { border: 2px double var(--purple); background: linear-gradient(180deg, rgba(255,250,255,0.98) 0%, rgba(240,230,245,0.95) 100%); box-shadow: 0 0 25px rgba(76,54,84,0.35), inset 0 0 20px rgba(76,54,84,0.2); }
+/* 5阶：赤霞神光 */
+.zx-tier-5 { border: 2px dashed var(--vermilion); background: linear-gradient(180deg, rgba(255,250,248,0.98) 0%, rgba(250,225,220,0.95) 100%); box-shadow: 0 0 35px rgba(142,40,31,0.4), inset 0 0 25px rgba(142,40,31,0.25); animation: zx-breath-red 3s infinite alternate; }
+/* 6阶：太上玉华 (双层发光框) */
+.zx-tier-6 { border: 2px solid transparent; background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(255,250,230,0.9) 100%) padding-box, linear-gradient(135deg, var(--gold), var(--cyan), var(--gold)) border-box; box-shadow: 0 0 45px rgba(179,139,77,0.6), inset 0 0 30px rgba(255,255,255,0.8); animation: zx-breath-gold 2.5s infinite alternate; }
+/* 7阶 (极致天道形态)：七彩神曦满覆 */
+.zx-tier-7 { border: 2px solid transparent; background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(255,240,245,0.85) 100%) padding-box, linear-gradient(45deg, var(--vermilion), var(--gold), var(--cyan), var(--purple)) border-box; box-shadow: 0 0 60px rgba(255,100,100,0.5), inset 0 0 40px rgba(255,215,0,0.5); animation: tier-rainbow-breath 5s infinite linear; }
+
+@keyframes zx-breath-red {
+    0% { box-shadow: 0 0 20px rgba(142,40,31,0.3), inset 0 0 15px rgba(142,40,31,0.2); }
+    100% { box-shadow: 0 0 45px rgba(142,40,31,0.6), inset 0 0 35px rgba(142,40,31,0.4); border-color: var(--vermilion); }
+}
+@keyframes zx-breath-gold {
+    0% { box-shadow: 0 0 30px rgba(179,139,77,0.4), inset 0 0 20px rgba(255,255,255,0.5); }
+    100% { box-shadow: 0 0 60px rgba(255,215,0,0.7), inset 0 0 40px rgba(255,255,255,0.9); }
+}
+/* === 全局主画卷容器华丽度体系 (强力重载原生 animation 突破压制) === */
+/* 修复冲突：将 all 改为具体属性，防止与呼吸灯动画打架 */
+.wrapper { transition: background-color 0.8s, border-color 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.wrapper::before, .wrapper::after { transition: all 0.6s ease; }
+
+/* 0-1阶 (引气-炼体)：维持原版熟宣纸底与弱呼吸灯 */
+
+/* 2阶 (筑基)：初现金青色道光 */
+.wrapper.app-tier-2 { animation: global-breath-t2 3s infinite alternate ease-in-out !important; }
+
+/* 3-5阶 (金丹-化神)：鎏金光华大盛，彻底抹除基础黑影 */
+.wrapper.app-tier-3, .wrapper.app-tier-4, .wrapper.app-tier-5 {
+    animation: global-breath-t3 3s infinite alternate ease-in-out !important;
+}
+.wrapper.app-tier-4::before, .wrapper.app-tier-4::after { width: 55px; height: 55px; border-width: 3px; opacity: 0.6; }
+.wrapper.app-tier-5::before, .wrapper.app-tier-5::after { width: 70px; height: 70px; border: 4px double var(--purple); opacity: 0.7; }
+
+/* 6-8阶 (合体-渡劫)：暗金紫雷，劫光流转 */
+.wrapper.app-tier-6 { animation: global-breath-t6 3s infinite alternate ease-in-out !important; border: 1px solid rgba(179,139,77,0.5); }
+.wrapper.app-tier-7 { animation: global-breath-t7 3s infinite alternate ease-in-out !important; border: 2px solid var(--gold); }
+.wrapper.app-tier-8 { 
+    border: 2px solid var(--vermilion); 
+    animation: global-breath-red 3s infinite alternate ease-in-out !important; 
+}
+.wrapper.app-tier-6::before, .wrapper.app-tier-6::after,
+.wrapper.app-tier-7::before, .wrapper.app-tier-7::after,
+.wrapper.app-tier-8::before, .wrapper.app-tier-8::after {
+    width: 90px; height: 90px; border: 6px double var(--gold); opacity: 0.85;
+}
+.wrapper.app-tier-8::before, .wrapper.app-tier-8::after { border-color: var(--vermilion); box-shadow: 0 0 8px var(--vermilion); }
+
+/* 9-10阶 (真仙-仙君)：蜕去凡尘，玉质流光外框覆写原始背景 */
+.wrapper.app-tier-9, .wrapper.app-tier-10 {
+    background-image: none !important; 
+    background-color: rgba(255,255,255,0.96) !important;
+    border: 2px solid #aed6f1;
+    animation: global-breath-cyan 3s infinite alternate ease-in-out !important;
+}
+.wrapper.app-tier-10 { border: 3px double #3498db; }
+.wrapper.app-tier-9::before, .wrapper.app-tier-9::after,
+.wrapper.app-tier-10::before, .wrapper.app-tier-10::after {
+    width: 110px; height: 110px; border: 3px solid #aed6f1; opacity: 0.9;
+    box-shadow: 0 0 10px #aed6f1;
+}
+
+/* 11-12阶 (仙王-仙帝)：金红流转无上大阵 */
+.wrapper.app-tier-11, .wrapper.app-tier-12 {
+    background-color: rgba(255,253,245,0.96) !important;
+    border: 3px solid transparent;
+    background-clip: padding-box, border-box;
+    background-origin: padding-box, border-box;
+    background-image: 
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.6) 0%, transparent 70%),
+        linear-gradient(135deg, var(--gold), var(--vermilion), var(--gold)) !important;
+    animation: global-breath-gold 2.5s infinite alternate ease-in-out !important;
+}
+.wrapper.app-tier-11::before, .wrapper.app-tier-11::after,
+.wrapper.app-tier-12::before, .wrapper.app-tier-12::after {
+    width: 140px; height: 140px; border: 8px double var(--gold); opacity: 1;
+    box-shadow: 0 0 15px var(--gold);
+}
+
+/* 13阶 (圣人)：万法归一，七彩琉璃混沌境 */
+.wrapper.app-tier-13 {
+    background-color: rgba(255,255,255,0.97) !important;
+    border: 4px solid transparent;
+    background-clip: padding-box, border-box;
+    background-origin: padding-box, border-box;
+    background-image: 
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.8) 0%, transparent 80%),
+        linear-gradient(45deg, #ff5e62, #ff9966, #ff00ff, #00ffff, #ff5e62) !important;
+    animation: global-rainbow-breath 4s infinite linear !important;
+}
+.wrapper.app-tier-13::before, .wrapper.app-tier-13::after {
+    width: 170px; height: 170px; border: 10px double var(--purple); opacity: 1;
+    box-shadow: 0 0 20px #00ffff;
+}
+
+/* 专属强制呼吸灯重载池 */
+@keyframes global-breath-t2 {
+    0% { box-shadow: 0 10px 40px rgba(59,95,96,0.2), inset 0 0 8px rgba(59,95,96,0.3); }
+    100% { box-shadow: 0 10px 60px rgba(59,95,96,0.5), inset 0 0 15px rgba(59,95,96,0.6); }
+}
+@keyframes global-breath-t3 {
+    0% { box-shadow: 0 15px 50px rgba(179,139,77,0.3), inset 0 0 10px rgba(179,139,77,0.3); }
+    100% { box-shadow: 0 15px 70px rgba(179,139,77,0.6), inset 0 0 25px rgba(179,139,77,0.5); }
+}
+@keyframes global-breath-t6 {
+    0% { box-shadow: 0 15px 60px rgba(179,139,77,0.4), inset 0 0 15px rgba(179,139,77,0.4); }
+    100% { box-shadow: 0 15px 80px rgba(179,139,77,0.8), inset 0 0 35px rgba(179,139,77,0.6); border-color: var(--gold); }
+}
+@keyframes global-breath-t7 {
+    0% { box-shadow: 0 15px 70px rgba(179,139,77,0.5), inset 0 0 20px rgba(179,139,77,0.5); }
+    100% { box-shadow: 0 15px 90px var(--gold), inset 0 0 45px var(--gold); }
+}
+@keyframes global-breath-red {
+    0% { box-shadow: 0 15px 60px rgba(142,40,31,0.4), inset 0 0 20px rgba(142,40,31,0.3); }
+    100% { box-shadow: 0 15px 100px rgba(142,40,31,0.9), inset 0 0 50px rgba(142,40,31,0.6); border-color: var(--vermilion); }
+}
+@keyframes global-breath-cyan {
+    0% { box-shadow: 0 15px 60px rgba(174,214,241,0.5), inset 0 0 25px rgba(255,255,255,0.8); }
+    100% { box-shadow: 0 15px 100px rgba(52,152,219,0.8), inset 0 0 50px rgba(255,255,255,1); border-color: #3498db; }
+}
+@keyframes global-breath-gold {
+    0% { box-shadow: 0 15px 70px rgba(255,215,0,0.5), inset 0 0 30px rgba(179,139,77,0.4); }
+    100% { box-shadow: 0 15px 120px rgba(255,215,0,1), inset 0 0 60px rgba(255,215,0,0.7); }
+}
+@keyframes global-rainbow-breath {
+    0% { box-shadow: 0 15px 100px rgba(180,100,255,0.6), inset 0 0 50px #fff; background-position: 0% 50%; filter: hue-rotate(0deg); }
+    100% { box-shadow: 0 15px 140px rgba(0,255,255,0.9), inset 0 0 80px #fff; background-position: 100% 50%; filter: hue-rotate(360deg); }
+}
+</style>
+</head>
+<body>
+
+<div class="wrapper" id="app">
+    <div class="wrapper-texture"></div>
+    <div class="header">
+        <div class="h-left">
+            <div id="ui-loc">大荒</div>
+        </div>
+        <div class="status-group">
+            <div id="ui-time">太古历</div>
+            <div class="pill-box">
+                <span class="pill" id="ui-qi">气: --</span>
+                <span class="pill" id="ui-weather">候: --</span>
+                <span class="pill" id="ui-state" style="color:var(--ink); font-weight:bold">--</span>
+            </div>
+            <div style="font-size:0.6rem; color:var(--sub); margin-top:4px; text-align:right">压制: <span id="ui-sup" class="c-red">0%</span></div>
+        </div>
+    </div>
+
+    <div class="content" id="view"></div>
+
+    <div class="navbar">
+        <div class="nav-btn active" onclick="Tab('status')"><span class="icon-gf">☯</span>道体</div>
+        <div class="nav-btn" onclick="Tab('sect')"><span class="icon-gf">⛩</span>宗门</div>
+        <div class="nav-btn" onclick="Tab('bag')"><span class="icon-gf">◎</span>行囊</div>
+        <div class="nav-btn" onclick="Tab('social')"><span class="icon-gf">❂</span>寻缘</div>
+        <div class="nav-btn" onclick="Tab('news')"><span class="icon-gf">☰</span>天机</div>
+        <div class="nav-btn" onclick="Tab('zhaixian')"><span class="icon-gf">❁</span>宅仙</div>
+    </div>
+<!-- 加入 if(event.target === this) 防止点击内部卡片时误触关闭 -->
+<div class="modal" id="modal" onclick="if(event.target === this) closeModal()">
+        <div class="m-card" id="m-card">
+            <div class="m-head">
+                <div class="m-head-title" id="m-title">天机命谱</div>
+                <div style="display:flex; gap:12px;">
+                    <div class="m-close" id="m-delete-btn" style="color:var(--vermilion); border-color:rgba(142,40,31,0.3);">抹除</div>
+                    <div class="m-close" onclick="closeModal()">归卷</div>
+                </div>
+            </div>
+            <div class="m-body" id="m-content"></div>
+        </div>
+    </div>
+
+
+<script>
+(function() {
+
+// ===============================================
+// 1. 数据解析 (Logic Core)
+// ===============================================
+
+const get = (root, path) => {
+    try {
+        if(!root) return undefined;
+        // 性能突破：Fast-Path。如果路径没有 '.' 和 '['，直接读取，绕过昂贵的正则和 split
+        if (path.indexOf('.') === -1 && path.indexOf('[') === -1) {
+            return root[path] !== undefined ? root[path] : undefined;
+        }
+        return path.split('.').reduce((obj, k) => {
+            const m = k.match(/^(.+)\[(\d+)\]$/);
+            if(m && obj[m[1]]) return obj[m[1]][parseInt(m[2])];
+            return (obj && obj[k] !== undefined) ? obj[k] : undefined;
+        }, root);
+    } catch(e) { return undefined; }
+};
+
+const val = (root, path, def = '无') => {
+    const v = get(root, path);
+    if(v === undefined || v === null) return def;
+    // 如果是数组 [值, 描述]，返回 值
+    if(Array.isArray(v) && v.length > 0) {
+        return (v[0] === '' || v[0] === undefined) ? def : v[0];
+    }
+    if(typeof v === 'object' && !Array.isArray(v)) return def;
+    return (v === '' || v === 0) ? (v===0?0:def) : v;
+};
+
+// 获取描述 (数组的第二项)
+const desc = (root, path) => {
+    const v = get(root, path);
+    if(Array.isArray(v) && v.length > 1) return v[1];
+    return '';
+};
+
+// 境界计算引擎 (14阶)
+const getRealmTier = (rStr) => {
+    if(!rStr) return 0;
+    const list = ['引气', '炼体', '筑基', '金丹', '元婴', '化神', '合体', '大乘', '渡劫', '真仙', '仙君', '仙王', '仙帝', '圣人'];
+    for(let i = list.length - 1; i >= 0; i--) {
+        if(rStr.includes(list[i])) return i;
+    }
+    return 0;
+};
+
+// 华丽内嵌花纹动态生成器 (层级越高，挂载的纹理印记越多)
+const getTierDecor = (tier, color) => {
+    let html = '';
+    if (tier < 3) return '';
+
+    // 金丹、元婴、化神 (3-5)：初生角花
+    if (tier >= 3 && tier <= 5) {
+        html += `<div class="tier-decor" style="top:2px; left:2px; width:12px; height:12px; border-top:2px solid ${color}; border-left:2px solid ${color}; opacity:0.5;"></div>`;
+        html += `<div class="tier-decor" style="bottom:2px; right:2px; width:12px; height:12px; border-bottom:2px solid ${color}; border-right:2px solid ${color}; opacity:0.5;"></div>`;
+    } 
+    // 合体、大乘、渡劫 (6-8)：繁复内外双角花 + 底层巨型暗刻法印
+    else if (tier >= 6 && tier <= 8) {
+        html += `<div class="tier-decor" style="top:4px; left:4px; width:24px; height:24px; border-top:2px double ${color}; border-left:2px double ${color}; opacity:0.7;"></div>`;
+        html += `<div class="tier-decor" style="bottom:4px; right:4px; width:24px; height:24px; border-bottom:2px double ${color}; border-right:2px double ${color}; opacity:0.7;"></div>`;
+        html += `<div class="tier-decor" style="top:8px; right:8px; width:8px; height:8px; border-top:1px solid ${color}; border-right:1px solid ${color}; opacity:0.5;"></div>`;
+        html += `<div class="tier-decor" style="bottom:8px; left:8px; width:8px; height:8px; border-bottom:1px solid ${color}; border-left:1px solid ${color}; opacity:0.5;"></div>`;
+        let stamp = tier === 8 ? '⚡' : '☯';
+        html += `<div class="tier-decor" style="right:15%; top:20%; font-size:4rem; color:${color}; opacity:0.06; font-family:var(--font-title); transform:rotate(-20deg);">${stamp}</div>`;
+    } 
+    // 真仙、仙君 (9-10)：仙云悬浮四角 + 白玉内发光框线
+    else if (tier >= 9 && tier <= 10) {
+        html += `<div class="tier-decor" style="inset:4px; border:1px solid ${color}; opacity:0.4; border-radius:2px;"></div>`;
+        html += `<div class="tier-decor" style="top:0; left:0; width:40px; height:40px; background:radial-gradient(circle at 0 0, ${color} 10%, transparent 70%); opacity:0.3;"></div>`;
+        html += `<div class="tier-decor" style="bottom:0; right:0; width:40px; height:40px; background:radial-gradient(circle at 100% 100%, ${color} 10%, transparent 70%); opacity:0.3;"></div>`;
+        html += `<div class="tier-decor" style="right:20px; top:50%; transform:translateY(-50%); font-size:2.5rem; color:${color}; opacity:0.15;">❀</div>`;
+    } 
+    // 仙王、仙帝、圣人 (11-13)：极致王权，多层仙阵叠加 + 实体神明印纹满覆
+    else if (tier >= 11) {
+        let emblem = tier === 13 ? '卍' : (tier === 12 ? '☸' : '♛');
+        html += `<div class="tier-decor" style="inset:3px; border:1px solid ${color}; opacity:0.6;"></div>`;
+        html += `<div class="tier-decor" style="inset:6px; border:1px dashed ${color}; opacity:0.3;"></div>`;
+        html += `<div class="tier-decor" style="top:2px; left:2px; width:16px; height:16px; background:${color}; opacity:0.2; clip-path:polygon(0 0, 100% 0, 0 100%);"></div>`;
+        html += `<div class="tier-decor" style="bottom:2px; right:2px; width:16px; height:16px; background:${color}; opacity:0.2; clip-path:polygon(100% 100%, 100% 0, 0 100%);"></div>`;
+        html += `<div class="tier-decor" style="right:30px; top:50%; transform:translateY(-50%); font-size:4rem; color:${color}; opacity:0.2; text-shadow:0 0 10px ${color};">${emblem}</div>`;
+    }
+    return html;
+};
+
+// 小宅仙 8 阶形态推算 (根据残片数量或阶段文本智能判定)
+const getZxTier = (phaseStr, fragments) => {
+    let f = parseInt(fragments) || 0;
+    // 如果有残片数量，优先用残片数映射 8 个形态 (假设 0-7 对应 8 个阶级)
+    if (f > 0) return Math.min(7, f);
+    
+    // 否则依靠形态名称智能推断
+    if (!phaseStr) return 0;
+    const phases = ['未苏醒', '初显', '聚灵', '凝体', '化形', '御道', '至尊', '天道'];
+    for (let i = phases.length - 1; i >= 0; i--) {
+        if (phaseStr.includes(phases[i])) return i;
+    }
+    return 0; // 默认沉睡/第一形态
+};
+
+// 小宅仙神纹大阵生成器 (等阶越高，背部大阵与祥云越密集)
+const getZxDecor = (tier) => {
+    let html = '';
+    if (tier < 1) return '';
+
+    const color = tier >= 6 ? 'var(--vermilion)' : (tier >= 3 ? 'var(--gold)' : 'var(--cyan)');
+
+    // 1-2阶：四角初结灵印
+    if (tier >= 1 && tier <= 2) {
+        html += `<div class="zx-decor" style="top:4px; left:4px; width:15px; height:15px; border-top:1px solid ${color}; border-left:1px solid ${color}; opacity:0.4;"></div>`;
+        html += `<div class="zx-decor" style="bottom:4px; right:4px; width:15px; height:15px; border-bottom:1px solid ${color}; border-right:1px solid ${color}; opacity:0.4;"></div>`;
+    }
+    // 3-5阶：莲华祥云 + 内部双层法阵线
+    else if (tier >= 3 && tier <= 5) {
+        html += `<div class="zx-decor" style="inset:6px; border:1px solid ${color}; opacity:0.3;"></div>`;
+        html += `<div class="zx-decor" style="top:0; left:50%; transform:translateX(-50%); font-size:2rem; color:${color}; opacity:0.1;">❁</div>`;
+        html += `<div class="zx-decor" style="bottom:0; left:50%; transform:translateX(-50%); font-size:2rem; color:${color}; opacity:0.1;">❁</div>`;
+        html += `<div class="zx-decor" style="top:10px; left:10px; width:30px; height:30px; border-top:2px double ${color}; border-left:2px double ${color}; opacity:0.5;"></div>`;
+        html += `<div class="zx-decor" style="bottom:10px; right:10px; width:30px; height:30px; border-bottom:2px double ${color}; border-right:2px double ${color}; opacity:0.5;"></div>`;
+        html += `<div class="zx-decor" style="right:10%; top:25%; font-size:6rem; color:${color}; opacity:0.04; font-family:var(--font-title); transform:rotate(15deg);">敕</div>`;
+    }
+    // 6-7阶：极致天道威压，巨大神印满覆底纹 + 繁复叠阵
+    else if (tier >= 6) {
+        let godSymbol = tier === 7 ? '卍' : '☯';
+        html += `<div class="zx-decor" style="inset:4px; border:2px solid ${color}; opacity:0.4;"></div>`;
+        html += `<div class="zx-decor" style="inset:10px; border:1px dashed var(--gold); opacity:0.5;"></div>`;
+        // 四角繁复金砖
+        ['top:0;left:0','top:0;right:0','bottom:0;left:0','bottom:0;right:0'].forEach(pos => {
+            html += `<div class="zx-decor" style="${pos}; width:40px; height:40px; background:radial-gradient(circle at center, var(--gold) 0%, transparent 60%); opacity:0.2;"></div>`;
+        });
+        // 核心巨型天道印记
+        html += `<div class="zx-decor" style="left:50%; top:45%; transform:translate(-50%, -50%); font-size:12rem; color:var(--gold); opacity:0.06; text-shadow: 0 0 20px var(--vermilion); pointer-events:none;">${godSymbol}</div>`;
+        html += `<div class="zx-decor" style="left:50%; top:45%; transform:translate(-50%, -50%); width:220px; height:220px; border:1px dashed var(--vermilion); border-radius:50%; opacity:0.1; pointer-events:none;"></div>`;
+    }
+    return html;
+};
+
+// 阿拉伯数字转中文数字 (骨龄、战力用)
+const numToZh = (numStr) => {
+    let num = parseInt(numStr);
+    if (isNaN(num)) return numStr; // 如果本来就是中文字符或无法解析，原样返回
+    if (num === 0) return '零';
+    const chnNumChar = ["零","一","二","三","四","五","六","七","八","九"];
+    const chnUnitSection = ["","万","亿","万亿"];
+    const chnUnitChar = ["","十","百","千"];
+    let strIns = '', chnStr = '';
+    let unitPos = 0, zero = true;
+    while(num > 0){
+        let v = num % 10000;
+        if(v === 0){
+            if(!zero){ zero = true; chnStr = chnNumChar[0] + chnStr; }
+        } else {
+            zero = false; strIns = '';
+            let tempV = v, p = 0;
+            while(tempV > 0){
+                let t = tempV % 10;
+                if(t === 0){
+                    if(p !== 0 && !strIns.startsWith(chnNumChar[0])) strIns = chnNumChar[0] + strIns;
+                } else {
+                    strIns = chnNumChar[t] + chnUnitChar[p] + strIns;
+                }
+                p++; tempV = Math.floor(tempV / 10);
+            }
+            chnStr = strIns + chnUnitSection[unitPos] + chnStr;
+        }
+        unitPos++; num = Math.floor(num / 10000);
+    }
+    if(chnStr.startsWith('一十')) chnStr = chnStr.substring(1); // 修复"一十五"变为"十五"
+    return chnStr;
+};
+
+const list = (root, path) => {
+    const v = get(root, path);
+    if(!v) return [];
+    // 圣人境法则二：消除高阶函数链带来的 GC 内存碎片
+    if(Array.isArray(v)) {
+        const res = [];
+        for(let i = 0, len = v.length; i < len; i++) {
+            const item = v[i];
+            if(item && typeof item === 'object' && !item.$meta && (item['名称'] || item['姓名'])) {
+                res.push(item);
+            }
+        }
+        return res;
+    }
+    if(typeof v === 'object') {
+        const keys = Object.keys(v);
+        const res = [];
+        for(let i = 0, len = keys.length; i < len; i++) {
+            const k = keys[i];
+            if(k === '$meta') continue;
+            const item = v[k];
+            if(typeof item === 'object' && item !== null) {
+                res.push({ ...item, _key: k });
+            }
+        }
+        return res;
+    }
+    return [];
+};
+
+// UI组件：进度条
+const bar = (label, cur, max, color) => {
+    const c = parseFloat(cur)||0; const m = parseFloat(max)||100;
+    const pct = Math.min(100, m>0?(c/m)*100:0);
+    return `<div class="prog-wrap">
+        <div class="prog-lbl">${label}</div>
+        <div class="prog-track"><div class="prog-bar" style="width:${pct}%; background:${color}"></div></div>
+        <div class="prog-val">${Math.floor(c)}</div>
+    </div>`;
+};
+
+// UI组件：KV块
+const kv = (k, v, color='') => `<div class="kv-box"><div class="kv-k">${k}</div><div class="kv-v" style="color:${color}">${v}</div></div>`;
+// UI组件：五行阵法雷达图 (纯SVG生成)
+const buildRadar = (stats) => {
+    const size = 140; const center = size / 2; const radius = 50;
+    let poly = ''; let labels = ''; let web = '';
+    const angle = (Math.PI * 2) / stats.length;
+
+    // 绘制八卦底网 (3层)
+    for(let level = 1; level <= 3; level++) {
+        let pts = ''; const r = radius * (level / 3);
+        for(let i = 0; i < stats.length; i++) {
+            const a = i * angle - Math.PI / 2;
+            pts += `${center + r * Math.cos(a)},${center + r * Math.sin(a)} `;
+        }
+        web += `<polygon points="${pts}" fill="${level===3?'rgba(179,139,77,0.03)':'none'}" stroke="rgba(179,139,77,0.2)" stroke-width="0.5"/>`;
+    }
+
+    // 绘制数据连线与标签
+    for(let i = 0; i < stats.length; i++) {
+        const a = i * angle - Math.PI / 2;
+        web += `<line x1="${center}" y1="${center}" x2="${center + radius*Math.cos(a)}" y2="${center + radius*Math.sin(a)}" stroke="rgba(179,139,77,0.2)" stroke-width="0.5"/>`;
+        
+        // 解析数值 (防报错处理，假设满值为100)
+        let v = parseFloat(stats[i].val) || 0; if(v > 100) v = 100;
+        const r = radius * (v / 100);
+        poly += `${center + r * Math.cos(a)},${center + r * Math.sin(a)} `;
+        
+        // 标签定位
+        const lx = center + (radius + 14) * Math.cos(a);
+        const ly = center + (radius + 12) * Math.sin(a);
+        labels += `<text x="${lx}" y="${ly}" fill="var(--ink)" font-family="var(--font-title)" font-size="10" text-anchor="middle" dominant-baseline="middle">${stats[i].label}</text>`;
+    }
+
+    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="filter: drop-shadow(0 0 10px rgba(179,139,77,0.3));">
+        ${web}
+        <polygon points="${poly}" fill="rgba(179,139,77,0.35)" stroke="var(--gold)" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="${center}" cy="${center}" r="2" fill="var(--gold)"/>
+        ${labels}
+    </svg>`;
+};
+// --- 背包状态管理 ---
+window.bagState = { cate: '全部', page: 1 };
+window.changeBagCate = (c) => { 
+    window.bagState.cate = c; window.bagState.page = 1; 
+    viewCache['bag'] = UI.bag(lastData); // 更新缓存
+    smoothRender(viewCache['bag']); // 平滑渲染
+};
+window.changeBagPage = (dir) => { 
+    window.bagState.page += dir; 
+    viewCache['bag'] = UI.bag(lastData); 
+    smoothRender(viewCache['bag']); 
+};
+
+// --- 寻缘状态管理与抹除逻辑 ---
+window.socialState = { page: 1 };
+window.changeSocialPage = (dir) => { 
+    window.socialState.page += dir; 
+    viewCache['social'] = UI.social(lastData);
+    smoothRender(viewCache['social']); 
+};
+window.deleteNPC = (idx) => {
+    const n = window._npcs[idx];
+    if(!n) return;
+    const npcName = val(n, '姓名', '未知');
+    
+    // 弹窗确认，防止手滑
+    if(!confirm(`天道无情，因果断绝。你确定要将「${npcName}」从命谱中彻底抹除吗？`)) return;
+    
+    // 构造发送给AI的系统指令
+    const hiddenCmd = `/sys [系统判定：天道无常，因果断绝。玩家已施展大神通将「${npcName}」从当前寻缘命谱中彻底抹去。请立刻将此人从你的记忆和后续的统计数据中删除。]`;
+    
+    try {
+        // 核心突破：获取酒馆外层真实主界面的 document
+        const parentDoc = window.parent ? window.parent.document : document;
+        const stInput = parentDoc.getElementById('send_textarea');
+        const stBtn = parentDoc.getElementById('send_but');
+        
+        if (stInput && stBtn) {
+            // 1. 填入隐藏指令
+            stInput.value = hiddenCmd;
+            
+            // 2. 触发原生 input 事件 (欺骗浏览器的基础机制)
+            stInput.dispatchEvent(new Event('input', { bubbles: true }));
+            
+            // 3. 触发 jQuery 事件 (欺骗酒馆的核心监听器)
+            const globalQuery = window.parent ? window.parent.$ : window.$;
+            if (typeof globalQuery !== 'undefined') {
+                globalQuery(stInput).trigger('input');
+            }
+
+            // 4. 延迟 50 毫秒，等酒馆输入框高度自适应完毕后，强行点击发送
+            setTimeout(() => {
+                stBtn.click();
+            }, 50);
+            
+        } else {
+            // 极端情况兜底：如果连父级 DOM 都被深度锁死了，弹窗让你复制
+            prompt("未能自动突破沙盒控制输入框，请手动复制以下指令并发送：", hiddenCmd);
+        }
+    } catch (e) {
+        console.error("跨域操作被拒绝:", e);
+        prompt("跨域限制阻挡了自动发送，请手动复制指令发送：", hiddenCmd);
+    }
+    
+    closeModal();
+    // 在前端临时删掉这个 NPC 并重新渲染，等 AI 回复更新数据后就彻底消失了
+    window._npcs.splice(idx, 1);
+    viewCache['social'] = UI.social(lastData);
+    smoothRender(viewCache['social']);
+};
+// ===============================================
+// 2. 渲染逻辑 (UI Render)
+// ===============================================
+const UI = {
+    // 头部刷新 (动态注入主角主画卷联动)
+    header: (d) => {
+        const w = d['世界']||{};
+        const c = d['战斗']||{};
+        const p = d['主角']||{};
+        
+        let tStr = val(w,'时间','太古历');
+        const rawTime = get(w, '时间');
+        if(Array.isArray(rawTime) && rawTime.length > 1 && rawTime[1]) tStr += ` · ${rawTime[1]}`;
+
+        document.getElementById('ui-loc').innerText = val(w,'地点','大荒');
+        document.getElementById('ui-time').innerText = tStr;
+        document.getElementById('ui-state').innerText = val(w,'世界动态','平静');
+        document.getElementById('ui-qi').innerText = '灵气: ' + val(w,'灵气浓度','稀薄');
+        document.getElementById('ui-weather').innerText = '天气: ' + val(w,'天气','晴');
+        document.getElementById('ui-sup').innerText = val(w,'天道压制', 0) + '%';
+        
+        // --- 核心联动：提取主角境界，实时更新全局主画卷外框华丽度 ---
+        const appDom = document.getElementById('app');
+        const protagonistRealm = val(p, '境界', '引气');
+        const pTier = typeof getRealmTier === 'function' ? getRealmTier(protagonistRealm) : 0;
+        
+        // 清理旧的阶级 class，挂载新阶级
+        appDom.className = appDom.className.replace(/\bapp-tier-\d+\b/g, '').trim();
+        appDom.classList.add(`app-tier-${pTier}`);
+        
+        // 维持原有的战斗状态判定
+        const state = val(c,'状态');
+        appDom.classList.toggle('combat', state !== '空闲' && state !== '无');
+    },
+
+    // Tab 1: 道体
+    status: (d) => {
+        const p = d['主角']||{};
+        const phy = p['生理']||{};
+        const arts = p['技艺']||{};
+        
+        const kf = list(p,'功法').map(i=>`<span title="${val(i,'描述')}" class="tag t-gold" style="cursor:help; margin-right:4px; margin-bottom:4px">${val(i,'名称')}</span>`).join('') || '<span class="tag t-outline">暂无功法</span>';
+        const ab = list(p,'神通').map(i=>`<span title="${val(i,'描述')}" class="tag t-cyan" style="cursor:help; margin-right:4px; margin-bottom:4px">${val(i,'名称')}</span>`).join('') || '<span class="tag t-outline">暂无神通</span>';
+        const badges = val(p,'成就勋章','无') !== '无' && Array.isArray(p['成就勋章']) ? p['成就勋章'].filter(x=>x!=='初入大荒').map(x=>`<span class="tag t-red">${x}</span>`).join(' ') : '<span class="tag t-outline">初入大荒</span>';
+
+        let artHtml = '';
+        ['炼丹','炼器','符箓','阵法','御兽'].forEach(k => {
+             artHtml += kv(k, val(arts, k));
+        });
+
+        const realmStr = val(p,'境界','凡');
+        // 根据境界字符长度动态调整印章字体大小
+        const sealSize = realmStr.length > 4 ? '1.1rem' : (realmStr.length > 2 ? '1.4rem' : '1.8rem');
+
+        return `
+        <div style="display:flex; gap:20px; align-items:center; margin-bottom:20px;">
+            <div class="seal" style="font-size: ${sealSize};">${realmStr}</div>
+            <div style="flex:1">
+                <div style="font-size:1.6rem; font-weight:bold; color:var(--ink); font-family:var(--font-title)">${val(p,'姓名','无名氏')}</div>
+                <div style="font-size:0.75rem; color:var(--sub); margin-top:6px;">
+                    <span class="tag t-outline">${val(p,'种族')}</span>
+                    <span style="margin:0 6px">${val(p,'体质')}</span>
+                    <span class="c-gold"><span class="icon-gf" style="font-size:0.8rem">✧</span> ${val(p,'气运')}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card" style="padding:12px">
+             <div style="font-size:0.65rem; color:var(--sub); margin-bottom:4px">成就勋章</div>
+             <div>${badges}</div>
+        </div>
+
+   <div class="sec-title"><span>◈</span> 根基状态</div>
+        <div class="card">
+            ${bar('命', val(p,'当前命'), val(p,'命'), 'var(--vermilion)')}
+            ${bar('灵', val(p,'当前灵'), val(p,'灵'), 'var(--cyan)')}
+            ${bar('道心', val(p,'道心'), 100, 'var(--purple)')}
+            ${bar('悟性', val(p,'悟'), 100, 'var(--gold)')}
+            ${bar('欲望', val(phy,'欲望槽'), 100, '#e74c3c')}
+        </div>
+
+      <div class="sec-title"><span>♨</span> 综合属性</div>
+        <div class="card" style="display:flex; gap:16px; align-items:center;">
+            <div style="flex-shrink:0; display:flex; justify-content:center; align-items:center;">
+                ${buildRadar([
+                    { label: '悟性', val: val(p,'悟') },
+                    { label: '道心', val: val(p,'道心') },
+                    { label: '神识', val: val(p,'神识') },
+                    { label: '魅力', val: val(p,'魅力') },
+                    { label: '气运', val: val(p,'气运').toString().replace(/[^0-9]/g,'') || 60 } // 提取数字或给默认值
+                ])}
+            </div>
+            
+            <div class="data-grid g-2" style="flex:1;">
+                ${kv('骨龄', numToZh(val(p,'年龄')))}
+                ${kv('战力', numToZh(val(p,'战力')), 'var(--vermilion)')}
+                ${kv('灵根', val(p,'灵根'))}
+                ${kv('名声', val(p,'名声'))}
+            </div>
+        </div>
+
+        <div class="sec-title"><span class="icon-gf">☲</span> 修真百艺</div>
+        <div class="card">
+            <div class="data-grid g-5">${artHtml}</div>
+        </div>
+
+        <div class="sec-title"><span class="icon-gf">🕮</span> 所学</div>
+        <div class="card">
+            <div style="margin-bottom:10px">
+                <div style="font-size:0.65rem; color:var(--sub); margin-bottom:6px">功法</div>
+                <div style="line-height:1.6">${kf}</div>
+            </div>
+            <div style="border-top:1px solid rgba(200,160,99,0.1); padding-top:10px">
+                <div style="font-size:0.65rem; color:var(--sub); margin-bottom:6px">神通</div>
+                <div style="line-height:1.6">${ab}</div>
+            </div>
+        </div>`;
+    },
+
+    // Tab 2: 宗门
+    sect: (d) => {
+        let s = get(d, '宗门.my_sect');
+        if (!s || !val(s, '名称') || val(s, '名称') === '无') {
+            const rootSect = get(d, '宗门');
+            if (rootSect) {
+                const key = Object.keys(rootSect).find(k => k !== '$meta' && k !== 'my_sect');
+                if(key) s = rootSect[key];
+            }
+        }
+
+        if(!s || !val(s,'名称') || val(s,'名称')==='无' || val(s,'名称')==='未知宗门') 
+            return '<div style="text-align:center;padding:100px 20px;color:var(--sub);">暂无宗门归属<br><span style="font-size:0.75rem">请前往大荒寻找机缘</span></div>';
+        
+        const res = s['资源']||{};
+        const blds = s['建筑']||{};
+        const base = s['底蕴']||{};
+        const pop = s['人口']||{};
+        const dip = s['外交']||{};
+        
+        let bHtml = '';
+        Object.keys(blds).forEach(k => {
+             if(k==='$meta') return;
+             bHtml += kv(k, val(blds,k));
+        });
+
+        return `
+        <div class="card" style="text-align:center; padding: 25px 10px;">
+            <div style="font-family:var(--font-title); font-size:2rem; color:var(--ink); margin-bottom:8px">${val(s,'名称')}</div>
+            <span class="tag t-gold">${val(s,'等级')}品势力</span>
+            <div style="margin-top:10px; font-size:0.7rem; color:var(--sub)">宗旨: ${val(s,'宗旨')}</div>
+            
+            <div class="data-grid g-3" style="margin-top:20px; border-top:1px solid rgba(200,160,99,0.1); padding-top:15px">
+                ${kv('声望', val(s,'声望'))}
+                ${kv('阵营', val(s,'阵营'))}
+                ${kv('通缉', val(s,'通缉'), 'var(--vermilion)')}
+            </div>
+            <div style="margin-top:12px; font-size:0.7rem; color:var(--sub)">风气: <span class="tag t-outline">${val(s,'风气')}</span></div>
+        </div>
+
+        <div class="sec-title"><span class="icon-gf">❖</span> 宗门资源</div>
+        <div class="card">
+            <div class="data-grid g-3">
+                 ${kv('灵脉', val(res,'灵脉'))}
+                 ${kv('灵石', val(res,'库存灵石'), 'var(--gold)')}
+                 ${kv('气运', val(res,'气运'), 'var(--purple)')}
+            </div>
+            <div style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(200,160,99,0.1)">
+                <div style="font-size:0.6rem; color:var(--sub); margin-bottom:4px">特产</div>
+                <div style="font-size:0.8rem; color:var(--ink)">${val(res,'特产')}</div>
+            </div>
+        </div>
+
+        <div class="sec-title"><span class="icon-gf">⚇</span> 人口结构</div>
+        <div class="card">
+            <div class="data-grid g-3" style="margin-bottom:12px; border-bottom:1px solid rgba(200,160,99,0.1); padding-bottom:12px">
+                ${kv('老祖', val(pop,'老祖'), 'var(--vermilion)')}
+                ${kv('宗主', val(pop,'宗主'))}
+                ${kv('圣女', val(pop,'圣女'), 'var(--purple)')}
+            </div>
+            <div class="data-grid g-2">
+                ${kv('长老数', val(pop,'长老数'))}
+                ${kv('弟子数', val(pop,'弟子数'))}
+            </div>
+        </div>
+
+        <div class="sec-title"><span class="icon-gf">⛩</span> 建筑规模</div>
+        <div class="card">
+             <div class="data-grid g-2">
+                 ${bHtml || '<div style="grid-column:span 2; text-align:center; color:var(--sub)">暂无建筑</div>'}
+             </div>
+        </div>
+
+        <div class="sec-title"><span class="icon-gf">☗</span> 底蕴与外交</div>
+        <div class="card">
+            <div class="data-grid g-2" style="margin-bottom:15px">
+                ${kv('护山大阵', val(base,'护山大阵'))}
+                ${kv('镇宗之宝', val(base,'镇宗之宝'), 'var(--gold)')}
+            </div>
+            <div style="font-size:0.7rem; color:var(--sub); margin-bottom:4px">功法传承</div>
+            <div style="margin-bottom:12px">${val(base,'功法传承')}</div>
+            
+            <div style="border-top:1px solid rgba(200,160,99,0.1); padding-top:12px">
+                 <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:6px">
+                    <span style="color:var(--vermilion)">敌对: ${val(dip,'敌对')}</span>
+                    <span style="color:var(--cyan)">盟友: ${val(dip,'盟友')}</span>
+                 </div>
+                 <div style="font-size:0.8rem; color:var(--sub)">附庸: ${val(dip,'附庸')}</div>
+            </div>
+        </div>`;
+    },
+
+   // Tab 3: 行囊 (自带前端智能正则分类)
+    bag: (d) => {
+        const a = d['资产']||{};
+        const allItems = list(d, '行囊.背包');
+
+        const currencyList = [
+            {k:'极品灵石', c:'var(--cyan)', i:'✦'},
+            {k:'上品灵石', c:'var(--cyan)', i:'✦'},
+            {k:'中品灵石', c:'var(--cyan)', i:'✦'},
+            {k:'下品灵石', c:'var(--cyan)', i:'✦'},
+            {k:'黄金', c:'var(--gold)', i:'●'},
+            {k:'白银', c:'#7f8c8d', i:'●'},
+            {k:'铜钱', c:'#d35400', i:'●'}
+        ];
+
+        const moneyHtml = currencyList.map(obj => {
+            const v = val(a, obj.k, 0); 
+            const descStr = desc(a, obj.k); 
+            return `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(0,0,0,0.05);">
+                <div style="display:flex; flex-direction:column">
+                    <span style="color:var(--ink); font-size:0.8rem">${obj.i} ${obj.k}</span>
+                    ${descStr ? `<span style="font-size:0.6rem; color:var(--sub)">${descStr}</span>` : ''}
+                </div>
+                <span style="font-weight:bold; color:${obj.c}; font-family:monospace; font-size:0.9rem">${v}</span>
+            </div>`;
+        }).join('');
+
+        // --- 升级：智能正则分类引擎 (GPU 级预编译优化) ---
+        // 将正则规则提升到内存常量，避免渲染时重复创建对象导致内存抖动
+        const RE = {
+            clothes_n: /[袍衣裙靴冠带簪甲铠裳]|披风/, pill_n: /[丹丸散膏药液]/, 
+            amulet_n: /[符箓阵诏篆]/, weapon_n: /[剑刀枪戟鼎印钟塔镜珠琴扇环伞刺斧弓尺梭盾幡]/,
+            clothes_d: /护具|防御|穿戴|衣服/, pill_d: /丹药|药效|疗伤|恢复|修为/,
+            amulet_d: /符文|符纸|阵法|卷轴/, weapon_d: /法宝|灵器|法器|飞剑|攻击|神兵/
+        };
+
+        const autoCategorize = (item) => {
+            let givenCate = val(item, '分类', '');
+            const cates = ['衣物', '杂物', '灵器', '丹药', '符箓'];
+            if (givenCate && cates.includes(givenCate)) return givenCate; 
+            
+            const name = val(item, '名称', '');
+            const desc = val(item, '描述', '') + val(item, '功效', '');
+            
+            // 匹配名称关键字 (权重最高)
+            if (RE.clothes_n.test(name)) return '衣物';
+            if (RE.pill_n.test(name) && !name.includes('草')) return '丹药';
+            if (RE.amulet_n.test(name)) return '符箓';
+            if (RE.weapon_n.test(name)) return '灵器';
+            
+            // 扫描描述内容 (次要权重)
+            if (RE.clothes_d.test(desc)) return '衣物';
+            if (RE.pill_d.test(desc) && !desc.includes('草药')) return '丹药';
+            if (RE.amulet_d.test(desc)) return '符箓';
+            if (RE.weapon_d.test(desc)) return '灵器';
+            
+            return '杂物';
+        };
+
+        // 1. 生成分类标签栏
+        const cates = ['全部', '衣物', '杂物', '灵器', '丹药', '符箓'];
+        const cateHtml = cates.map(c => 
+            `<div class="bag-cate-btn ${window.bagState.cate === c ? 'active' : ''}" onclick="changeBagCate('${c}')">${c}</div>`
+        ).join('');
+
+        // 2. 预处理所有物品，给它们强制打上智能推断的标签
+        const processedItems = allItems.map(i => {
+            i._autoCate = autoCategorize(i);
+            return i;
+        });
+
+        // 3. 过滤当前分类
+        let filtered = processedItems;
+        if(window.bagState.cate !== '全部') {
+            filtered = processedItems.filter(i => i._autoCate === window.bagState.cate);
+        }
+        
+        // 4. 计算翻页逻辑 (8个一页)
+        const totalPages = Math.max(1, Math.ceil(filtered.length / 8));
+        if(window.bagState.page > totalPages) window.bagState.page = totalPages; 
+        const startIdx = (window.bagState.page - 1) * 8;
+        const pagedItems = filtered.slice(startIdx, startIdx + 8);
+
+        // 5. 生成物品列表 HTML
+        const itemHtml = pagedItems.length ? pagedItems.map(i => {
+            const q = val(i,'品质','白');
+            let qc = 'rgba(255,255,255,0.5)'; let tc = 'var(--sub)';
+            if(q.includes('金') || q.includes('橙') || q.includes('极')) { qc = 'rgba(200,160,99,0.2)'; tc = 'var(--gold)'; }
+            else if(q.includes('紫') || q.includes('仙')) { qc = 'rgba(92,67,102,0.2)'; tc = 'var(--purple)'; }
+            else if(q.includes('蓝') || q.includes('玄') || q.includes('珍')) { qc = 'rgba(74,111,112,0.2)'; tc = 'var(--cyan)'; }
+            else if(q.includes('红') || q.includes('血') || q.includes('神')) { qc = 'rgba(142,40,31,0.2)'; tc = 'var(--vermilion)'; }
+            else if(q.includes('绿') || q.includes('翠')) { qc = 'rgba(91,140,90,0.2)'; tc = '#5b8c5a'; }
+            
+            return `
+            <details class="bag-item-details">
+                <summary class="bag-item-summary">
+                    <div class="item-icon" style="background:${qc}; color:${tc}; border-color:${qc}">※</div>
+                    <div style="flex:1; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <span style="font-size:0.95rem; font-weight:700; color:${tc}">${val(i,'名称')}</span>
+                            <span class="tag t-outline" style="font-size:0.6rem; margin-left:4px">${i._autoCate}</span>
+                        </div>
+                        <span style="font-size:0.75rem; color:var(--sub); font-family:monospace">x${val(i,'数量')}</span>
+                    </div>
+                    <div class="bag-expand-icon">▶</div>
+                </summary>
+                <div class="item-desc-box">
+                    ${val(i,'描述', '这件物品被岁月侵蚀，看不出端倪...')}
+                    ${val(i,'功效') ? `<div style="margin-top:6px; color:var(--cyan); font-weight:bold;">[功效] <span style="font-weight:normal">${val(i,'功效')}</span></div>` : ''}
+                </div>
+            </details>`;
+        }).join('') : '<div style="text-align:center;padding:40px;color:var(--sub)">纳戒此域，空空如也</div>';
+
+        // 6. 生成底部分页器 HTML
+        const pageHtml = `
+        <div class="pagination">
+            <div class="page-btn ${window.bagState.page <= 1 ? 'disabled' : ''}" onclick="changeBagPage(-1)">前卷</div>
+            <span style="color:var(--sub)">第 ${window.bagState.page} / ${totalPages} 卷</span>
+            <div class="page-btn ${window.bagState.page >= totalPages ? 'disabled' : ''}" onclick="changeBagPage(1)">后卷</div>
+        </div>`;
+
+        return `
+        <div class="sec-title"><span class="icon-gf">◐</span> 财帛</div>
+        <div class="card">
+            <div style="display:flex; flex-direction:column;">${moneyHtml}</div>
+        </div>
+        <div class="sec-title"><span class="icon-gf">◱</span> 纳戒物品</div>
+        <div class="bag-cates">${cateHtml}</div>
+        <div class="card" style="padding:0 16px 16px">
+            ${itemHtml}
+            ${totalPages > 1 ? pageHtml : ''}
+        </div>`;
+    },
+
+    // Tab 4: 寻缘 (气运化色 & 玉牌排版特化版)
+    social: (d) => {
+        const npcs = list(d, '寻缘蝶');
+        if(!npcs.length) return '<div style="text-align:center;padding:100px 20px;color:var(--sub);font-style:italic">命轨未动<br><span style="font-size:0.75rem">红尘无扰，静修己身</span></div>';
+        
+        window._npcs = npcs; 
+
+        // 分页逻辑 (6个一页)
+        const totalPages = Math.max(1, Math.ceil(npcs.length / 6));
+        if(window.socialState.page > totalPages) window.socialState.page = totalPages;
+        const startIdx = (window.socialState.page - 1) * 6;
+        const pagedNpcs = npcs.slice(startIdx, startIdx + 6);
+
+        // 核心：根据气运词条判断专属主题色
+        const getLuckColor = (luckStr) => {
+            if (!luckStr) return '#111418'; 
+            if (luckStr.includes('金') || luckStr.includes('橙') || luckStr.includes('黄')) return '#c89b40'; 
+            if (luckStr.includes('紫')) return '#7e57c2'; 
+            if (luckStr.includes('红') || luckStr.includes('血') || luckStr.includes('凶')) return '#ab2b2b'; 
+            if (luckStr.includes('蓝') || luckStr.includes('青')) return '#4a90e2'; 
+            if (luckStr.includes('绿') || luckStr.includes('翠')) return '#5b8c5a'; 
+            if (luckStr.includes('黑') || luckStr.includes('灰') || luckStr.includes('厄')) return '#4a4f52'; 
+            return '#111418'; 
+        };
+
+        const listHtml = pagedNpcs.map((n, idx) => {
+            const globalIdx = startIdx + idx; 
+            const luckStr = val(n, '气运', '');
+            const nameColor = getLuckColor(luckStr);
+            const title = val(n, '道号');
+            
+            // 提取境界等级，挂载华丽体系
+            const tier = getRealmTier(val(n, '境界'));
+            const decorHtml = getTierDecor(tier, nameColor);
+            
+            // 仙尊套 (Tier 9+) 极大增强头像框的神格光晕
+            const avatarGlow = tier >= 9 ? `box-shadow: inset 0 0 15px ${nameColor}, 0 0 10px ${nameColor}; border-width: 2px;` : `box-shadow: inset 0 0 8px ${nameColor}20;`;
+
+            return `
+            <div class="card tier-card tier-${tier} npc-clickable" data-idx="${globalIdx}" style="cursor:pointer; display:flex; gap:12px; align-items:center; padding: 12px 14px; border-left: 4px solid ${nameColor}; margin-bottom: 12px; position: relative; transition: transform 0.2s, box-shadow 0.2s;">
+                ${decorHtml}
+                <div style="width: 38px; height: 38px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; border: 1px solid ${nameColor}50; background: ${nameColor}10; color: ${nameColor}; font-family: var(--font-title); font-size: 1.2rem; border-radius: 4px; transform: rotate(45deg); ${avatarGlow} position: relative; z-index: 2;">
+                    <span style="transform: rotate(-45deg); text-shadow: 0 1px 2px ${nameColor}40;">${val(n,'姓名')[0]}</span>
+                </div>
+                
+                <div style="flex: 1; overflow: hidden; margin-left: 6px; position: relative; z-index: 2;">
+                    <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px;">
+                        <span style="font-family: var(--font-title); font-size: 1.15rem; color: ${nameColor}; letter-spacing: 1px; font-weight: bold;">${val(n,'姓名')}</span>
+                        ${title ? `<span style="font-size: 0.65rem; color: var(--sub); font-style: italic;">「${title}」</span>` : ''}
+                    </div>
+                    <div style="display: flex; gap: 4px; flex-wrap: wrap; font-size: 0.6rem; color: var(--sub);">
+                        <span style="border: 1px solid rgba(179,139,77,0.3); padding: 1px 4px; border-radius: 2px; background: rgba(255,255,255,0.5); font-weight: bold; color: var(--ink-main);">${val(n,'境界')}</span>
+                        <span style="border: 1px solid rgba(179,139,77,0.2); padding: 1px 4px; border-radius: 2px; background: rgba(255,255,255,0.3);">${val(n,'关系')}</span>
+                        ${val(n,'交互模式') && val(n,'交互模式')!=='默认' ? `<span style="border: 1px solid rgba(142,40,31,0.2); color: var(--vermilion); padding: 1px 4px; border-radius: 2px;">${val(n,'交互模式')}</span>` : ''}
+                    </div>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; border-left: 1px dashed rgba(0,0,0,0.08); padding-left: 12px; position: relative; z-index: 2;">
+                    <span style="font-size: 0.6rem; color: var(--sub); letter-spacing: 1px; margin-bottom: 2px;">羁绊</span>
+                    <span style="color: var(--vermilion); font-family: monospace; font-size: 1rem; font-weight: bold;">
+                        ${val(n,'好感度')}
+                    </span>
+                </div>
+            </div>`;
+        }).join('');
+
+        const pageHtml = `
+        <div class="pagination">
+            <div class="page-btn ${window.socialState.page <= 1 ? 'disabled' : ''}" onclick="changeSocialPage(-1)">前卷</div>
+            <span style="color:var(--sub)">第 ${window.socialState.page} / ${totalPages} 卷</span>
+            <div class="page-btn ${window.socialState.page >= totalPages ? 'disabled' : ''}" onclick="changeSocialPage(1)">后卷</div>
+        </div>`;
+
+        return `
+        <div class="sec-title"><span class="icon-gf">❂</span> 命谱寻缘</div>
+        <div style="padding: 0 4px;">
+            ${listHtml}
+            ${totalPages > 1 ? pageHtml : ''}
+        </div>`;
+    },
+// Tab 5: 天机
+    news: (d) => {
+        const n = d['宅仙报']||{};
+        const logs = val(d,'战斗.战斗日志')||[];
+        const logArr = Array.isArray(logs)?logs:[logs];
+        const pets = list(d, '灵兽栏'); 
+
+        const petHtml = pets.length ? pets.map(p => `
+        <div class="list-item">
+            <div class="item-icon" style="background:rgba(74,111,112,0.1); color:var(--cyan); border:none"><span class="icon-gf">🐾</span></div>
+            <div class="item-main">
+                <div class="item-title">
+                    <span>${val(p,'名称')} <span style="font-size:0.7rem;color:var(--sub);font-weight:normal">(${val(p,'种族')})</span></span>
+                    <span class="tag t-gold">${val(p,'境界')}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px">
+                    <span class="tag t-outline">${val(p,'化形状态')}</span>
+                    <div style="flex:1; margin-left:15px">${bar('忠诚', val(p,'忠诚度'), 100, 'var(--cyan)').replace('margin-bottom: 10px', 'margin-bottom: 0')}</div>
+                </div>
+            </div>
+        </div>`).join('') : '<div style="text-align:center;color:var(--sub);padding:10px">无灵兽</div>';
+
+        return `
+        ${logArr[0] !== '暂无战斗记录' ? `<div class="card" style="border-left:3px solid var(--vermilion); background:rgba(158,42,34,0.03)"><div style="font-weight:bold; color:var(--vermilion); font-size:0.85rem; margin-bottom:6px"><span class="icon-gf">⚡</span> 战斗速报</div><div style="line-height:1.5; color:var(--ink); font-size:0.85rem">${logArr.join('<br>')}</div></div>` : ''}
+
+        <div class="sec-title"><span class="icon-gf">🐾</span> 灵兽栏</div>
+        <div class="card" style="padding:0 16px">${petHtml}</div>
+
+        <div class="sec-title"><span>☰</span> 宅仙报</div>
+        <div class="card">
+            <div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid rgba(0,0,0,0.05)">
+                <div style="font-weight:bold; color:var(--cyan); font-size:0.8rem; margin-bottom:4px">天机阁榜单</div>
+                <div style="color:var(--ink); line-height:1.5; font-size:0.85rem">${val(n,'天机阁')}</div>
+            </div>
+            <div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid rgba(0,0,0,0.05)">
+                <div style="font-weight:bold; color:var(--gold); font-size:0.8rem; margin-bottom:4px">散仙小道</div>
+                <div style="color:var(--ink); line-height:1.5; font-size:0.85rem">${val(n,'散仙小道')}</div>
+            </div>
+            <div>
+                <div style="font-weight:bold; color:var(--vermilion); font-size:0.8rem; margin-bottom:4px">宅仙有话说</div>
+                <div style="color:var(--ink); font-style:italic; line-height:1.5; font-size:0.85rem; background:rgba(255,255,255,0.4); padding:8px; border-radius:4px">"${val(n,'宅仙有话说')}"</div>
+            </div>
+        </div>`;
+    },
+
+// Tab 6: 宅仙 (独立神明面板)
+    zhaixian: (d) => {
+        const zx = d['小宅仙面板']||{};
+        const zxImg = zx['人物形象'] || {};
+
+        if(!Object.keys(zx).length) return '<div style="text-align:center;padding:100px 20px;color:var(--sub);font-style:italic">天道未显<br><span style="font-size:0.75rem">小宅仙尚未苏醒</span></div>';
+
+        // 辅助渲染私密部位，提取 [短标签, 长描述] 实现辞典式排版
+        const renderZxBody = (key, titleColor, label) => {
+            let raw = zxImg[key];
+            if (!raw) return '';
+            let short = Array.isArray(raw) ? raw[0] : raw;
+            let long = Array.isArray(raw) && raw.length > 1 ? raw[1] : '';
+            return `
+            <div class="yy-body-row" style="margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px dashed rgba(179,139,77,0.15);">
+                <span class="yy-body-k" style="color:${titleColor}; font-weight:bold;">${label || key}</span>
+                <span class="yy-body-v" style="color:var(--ink-main); font-size:0.85rem;">${short}</span>
+                ${long ? `<div class="yy-body-desc" style="color:var(--ink); font-size:0.75rem; line-height:1.6; margin-top:6px; padding-left:10px; border-left:2px solid ${titleColor}50; background:rgba(255,255,255,0.4); padding-top:6px; padding-bottom:6px; border-radius: 0 4px 4px 0;">${long}</div>` : ''}
+            </div>`;
+        };
+
+        // 动态推断小宅仙形态阶级 (8阶) 并生成神格阵纹
+        const phase = val(zx, '当前阶段', '未苏醒');
+        const fragCount = val(zx, '天道残片数', 0);
+        const zxTier = getZxTier(phase, fragCount);
+        const zxDecorHtml = getZxDecor(zxTier);
+
+        // 随着等阶提高，大标题色泽也越发刺目
+        const titleColor = zxTier >= 6 ? 'var(--vermilion)' : (zxTier >= 3 ? 'var(--gold)' : 'var(--ink-main)');
+
+        return `
+        <div class="sec-title"><span class="icon-gf">❁</span> 天道化身 <span class="tag t-gold" style="font-size:0.65rem; margin-left:6px">第 ${numToZh(zxTier + 1)} 阶神格</span></div>
+        <div class="card zx-card zx-tier-${zxTier}" style="padding: 22px 18px; position: relative;">
+            ${zxDecorHtml}
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px dashed rgba(179,139,77,0.3); padding-bottom:12px; margin-bottom:12px; position:relative; z-index:2;">
+                <div style="font-family:var(--font-title); font-size:2rem; color:${titleColor}; letter-spacing:2px; text-shadow: 0 2px 6px rgba(142,40,31,0.15); font-weight:bold;">小宅仙</div>
+                <div style="text-align:right;">
+                    <div style="font-size:1rem; color:${titleColor}; font-weight:bold;">${phase}</div>
+                    <div style="font-size:0.75rem; color:var(--sub); margin-top:4px;">融合残片：<span style="color:var(--vermilion); font-family:monospace; font-weight:bold; font-size:1rem; background:rgba(255,255,255,0.6); padding:0 4px; border-radius:2px;">${fragCount}</span></div>
+                </div>
+            </div>
+            
+            <div class="data-grid g-2" style="margin-bottom:16px;">
+                ${kv('本源性格', val(zx, '性格'))}
+                ${kv('干涉力', val(zx, '力量等级'), 'var(--cyan)')}
+            </div>
+            
+            <div style="font-size:0.8rem; color:var(--ink); line-height:1.7; padding: 14px; background:radial-gradient(circle at center, rgba(179,139,77,0.05) 0%, transparent 100%); border-radius:4px; margin-bottom:16px; border: 1px solid rgba(179,139,77,0.1);">
+                <div style="margin-bottom:6px;"><span style="color:var(--gold); font-weight:bold;">「灵体质感」</span> ${val(zxImg, '肉体')}</div>
+                <div style="margin-bottom:6px;"><span style="color:var(--gold); font-weight:bold;">「神明姿容」</span> ${val(zxImg, '外貌')}</div>
+                <div><span style="color:var(--gold); font-weight:bold;">「天道法衣」</span> ${val(zxImg, '衣着')}</div>
+            </div>
+            
+            <details class="bag-item-details" style="border-top:1px dashed rgba(179,139,77,0.3); padding-top:12px;">
+                <summary class="bag-item-summary" style="padding: 6px 0; justify-content:center;">
+                    <span style="font-size:0.85rem; color:var(--vermilion); font-weight:bold; letter-spacing: 2px; text-shadow: 0 1px 2px rgba(142,40,31,0.2);">窥探神明私密 ▼</span>
+                </summary>
+                <div style="padding-top:16px; animation: ink-fade 0.3s ease;">
+                    <div style="display:flex; justify-content:center; align-items:center; gap: 10px; margin-bottom:16px; border-bottom:1px solid rgba(142,40,31,0.1); padding-bottom:12px;">
+                        <span style="color:var(--sub); font-size:0.75rem;">渎神交合次数</span> 
+                        <span style="font-family:monospace; color:var(--vermilion); font-size: 1.3rem; font-weight:bold;">${val(zx, '交合次数', 0)}</span>
+                    </div>
+                    
+                    <div class="yy-body-box" style="background: radial-gradient(circle at top, rgba(142,40,31,0.03) 0%, rgba(255,255,255,0.4) 100%); border: 1px solid rgba(142,40,31,0.2); padding: 12px 14px;">
+                        ${renderZxBody('奶子', 'var(--vermilion)', '圣乳')}
+                        ${renderZxBody('小穴', 'var(--vermilion)', '神穴')}
+                        ${renderZxBody('屁眼', 'var(--vermilion)', '秘菊')}
+                        ${renderZxBody('玉足', 'var(--purple)', '玉足')}
+                        ${renderZxBody('嘴唇', 'var(--purple)', '樱唇')}
+                    </div>
+                </div>
+            </details>
+        </div>`;
+    }
+};
+
+// ===============================================
+// 3. 交互逻辑 (Interaction)
+// ===============================================
+let lastData = {};
+let viewCache = {};
+let lastDataStr = "";
+
+// 核心：平滑渲染函数，防止重绘风暴
+const smoothRender = (htmlStr) => {
+    const view = document.getElementById('view');
+    view.classList.add('view-hidden'); // 1. 褪去当前内容
+    
+    setTimeout(() => {
+        view.scrollTop = 0;
+        view.innerHTML = htmlStr; // 2. 替换 DOM
+        
+        requestAnimationFrame(() => {
+            view.classList.remove('view-hidden'); // 3. 展现新内容
+            view.classList.add('view-transition');
+        });
+    }, 150); // 等待过渡动画完成
+};
+
+window.Tab = (key) => {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const idx = ['status','sect','bag','social','news','zhaixian'].indexOf(key);
+    if(idx >= 0) document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+    
+    // 圣人境法则一：斩断 JSON 序列化的算力业障 (O(N) 降维打击为 O(1))
+    // 仅通过内存引用比对判断数据变动，彻底规避深拷贝遍历的极高 CPU 开销
+    if (window._globalDataRef !== lastData) {
+        viewCache = {}; 
+        window._globalDataRef = lastData;
+    }
+
+    // 利用缓存，避免重复执行庞大的 UI 渲染函数
+    if (!viewCache[key]) {
+        viewCache[key] = UI[key] ? UI[key](lastData) : '<div style="padding:50px;text-align:center;color:var(--sub)">天道演算中...</div>';
+    }
+    
+    smoothRender(viewCache[key]);
+};
+
+// 天道法则二：元神暗流（无感刷新引擎）
+// 专门处理后台数据变化，绝不打断玩家当前的滚动或交互
+window.SilentUpdate = (key) => {
+    if (window._globalDataRef !== lastData) {
+        viewCache = {}; 
+        window._globalDataRef = lastData;
+    }
+    if (!viewCache[key]) viewCache[key] = UI[key] ? UI[key](lastData) : '';
+    
+    const view = document.getElementById('view');
+    // 锁定乾坤：记忆当前滚动条坐标
+    const scrollPos = view.scrollTop; 
+    
+    // 记忆法相：提取所有正在展开的 details 物品标识 (提取前50个字符作为指纹)
+    const openDetails = Array.from(view.querySelectorAll('details[open]')).map(d => d.innerHTML.substring(0, 50)); 
+
+    // 静默重塑肉身 (不触发动画类)
+    view.innerHTML = viewCache[key]; 
+    
+    // 坐标与状态瞬间归位
+    view.scrollTop = scrollPos; 
+    if (openDetails.length > 0) {
+        view.querySelectorAll('details').forEach(d => {
+            // 如果新渲染的物品指纹在记忆库中，强行保持展开
+            if(openDetails.some(openHtml => d.innerHTML.startsWith(openHtml))) {
+                d.open = true; 
+            }
+        });
+    }
+};
+
+window.openModal = (idx) => {
+    const n = window._npcs[idx];
+    if(!n) return;
+    
+    // 气运颜色算法 (与列表保持一致)
+    const getLuckColor = (luckStr) => {
+        if (!luckStr) return 'var(--ink-main)'; 
+        if (luckStr.includes('金') || luckStr.includes('橙') || luckStr.includes('黄')) return '#c89b40';
+        if (luckStr.includes('紫')) return '#7e57c2'; 
+        if (luckStr.includes('红') || luckStr.includes('血') || luckStr.includes('凶')) return '#ab2b2b'; 
+        if (luckStr.includes('蓝') || luckStr.includes('青')) return '#4a90e2'; 
+        if (luckStr.includes('绿') || luckStr.includes('翠')) return '#5b8c5a'; 
+        if (luckStr.includes('黑') || luckStr.includes('灰') || luckStr.includes('厄')) return '#4a4f52'; 
+        return 'var(--ink-main)'; 
+    };
+
+    const luckStr = val(n, '气运', '');
+    const nameColor = getLuckColor(luckStr);
+
+// 提取数据与性别判定
+    const gender = val(n, '性别', '女'); // 获取性别用于肉体差分
+    const sens = n['敏感度'] || (n['生理'] ? n['生理']['敏感度'] : {}) || {};
+    const preg = n['孕育'] || (n['生理'] ? n['生理']['孕育'] : {}) || {};
+    const body = n['肉体详情'] || {}; 
+
+    const npcSkill = list(n, '功法').map(i => `<span class="tag t-gold">${val(i,'名称')}</span>`).join('') || '<span class="tag t-outline">无</span>';
+    const npcAbility = list(n, '神通').map(i => `<span class="tag t-cyan">${val(i,'名称')}</span>`).join('') || '<span class="tag t-outline">无</span>';
+    
+    // XP 标签 (转为小巧符箓)
+    const rawXP = val(n, '性癖XP', []);
+    const xpList = Array.isArray(rawXP) ? rawXP : (typeof rawXP === 'string' ? rawXP.split('/') : []);
+    const xpTags = xpList.map(x => `<span class="yy-xp-tag">${x}</span>`).join('');
+
+    // 敏感度条 (引入性别差分过滤)
+    let sensHtml = '';
+    for(let k in sens) {
+        if(k==='$meta') continue;
+        // 核心过滤：男不显前穴/小穴，女不显阳具/囊袋，双性全显
+        if (gender === '男' && (k === '前穴' || k === '小穴')) continue;
+        if (gender === '女' && (k === '阳具' || k === '囊袋')) continue;
+
+        let v = Array.isArray(sens[k])?sens[k][0]:sens[k];
+        let pct = Math.min(100, (parseFloat(v)||0));
+        sensHtml += `
+        <div class="yy-sens-row">
+            <div class="yy-sens-lbl">${k}</div>
+            <div class="yy-sens-track"><div class="yy-sens-bar" style="width:${pct}%;"></div></div>
+            <div class="yy-sens-val">${Math.floor(v)}</div>
+        </div>`;
+    }
+
+    // 肉身辛密 (引入性别差分过滤)
+    let bodyHtml = '';
+    if(Object.keys(body).length > 0) {
+        for (let k in body) {
+            if(k==='$meta') continue;
+            // 核心过滤：剔除不符合性别的器官描写
+            if (gender === '男' && (k === '小穴' || k === '前穴')) continue;
+            if (gender === '女' && (k === '阳具' || k === '囊袋' || k === '前列腺')) continue;
+
+            let raw = body[k];
+            let short = Array.isArray(raw) ? raw[0] : raw;
+            let long = Array.isArray(raw) && raw.length > 1 ? raw[1] : '';
+
+            bodyHtml += `
+            <div class="yy-body-row">
+                <span class="yy-body-k">${k}</span>
+                <span class="yy-body-v">${short}</span>
+                ${long ? `<div class="yy-body-desc">${long}</div>` : ''}
+            </div>`;
+        }
+    } else {
+        bodyHtml = '<div style="color:var(--sub); font-size:0.7rem; text-align:center; font-style:italic;">迷雾遮蔽，未得探寻...</div>';
+    }
+
+    // 专属 KV 渲染器 (适配上面的基本信息)
+    const mkv = (k, v, c='') => `<div class="m-td"><div class="m-td-k">${k}</div><div class="m-td-v" style="color:${c}">${v}</div></div>`;
+
+    // 拼接最终 HTML 结构
+    const html = `
+    <div class="m-banner">
+        <div style="width: 72px; height: 72px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; border: 1px solid ${nameColor}50; background: ${nameColor}10; color: ${nameColor}; font-family: var(--font-title); font-size: 2rem; border-radius: 4px; transform: rotate(45deg); box-shadow: inset 0 0 15px ${nameColor}20; position:relative; z-index:2;">
+            <span style="transform: rotate(-45deg); text-shadow: 0 2px 4px ${nameColor}40;">${val(n,'姓名')[0]}</span>
+        </div>
+        <div style="flex:1; margin-left:16px;">
+            <div style="font-family: var(--font-title); font-size: 2.2rem; color: ${nameColor}; letter-spacing: 2px; line-height: 1;">${val(n,'姓名')}</div>
+            <div style="font-size: 0.85rem; color: var(--sub); margin-top: 8px;">道号：<span style="color: var(--ink);">${val(n,'道号')||'无'}</span></div>
+            <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap">
+                <span class="tag t-gold">${val(n,'境界')}</span>
+                <span class="tag t-outline">${val(n,'当前状态','正常')}</span>
+                <span class="tag t-purple">${val(n,'交互模式')}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="m-quote">「 ${val(n,'心理活动','心如止水，波澜不惊...')} 」</div>
+
+    <div class="m-section">
+        <div class="m-sec-title">命理根骨</div>
+        ${bar('命元', val(n,'当前命'), val(n,'命'), 'var(--vermilion)')}
+        ${bar('灵力', val(n,'当前灵'), val(n,'灵'), 'var(--cyan)')}
+        ${bar('道心', val(n,'道心'), 100, 'var(--purple)')}
+        <div class="m-table" style="margin-top:24px; padding-top:20px; border-top:1px dashed rgba(179,139,77,0.3);">
+            ${mkv('种族', val(n,'种族'))} ${mkv('年龄', val(n,'年龄'))} ${mkv('气运', val(n,'气运'), nameColor)}
+            ${mkv('灵根', val(n,'灵根'))} ${mkv('体质', val(n,'体质'))} ${mkv('所在地', val(n,'所在地'))}
+        </div>
+    </div>
+
+    <div class="m-section" style="background: rgba(0,0,0,0.02); border-top: 1px solid rgba(179,139,77,0.1); padding-bottom: 10px;">
+        <div class="m-sec-title">性情与所学</div>
+        <div class="m-table" style="margin-bottom:20px;">
+            ${mkv('性格', val(n,'性格'))}
+            ${val(n,'性格2') && val(n,'性格2')!=='未知' ? mkv('隐性', val(n,'性格2')) : mkv('喜好', val(n,'喜好'))}
+            ${mkv('弱点', val(n,'弱点'), 'var(--sub)')}
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; border-top:1px dashed rgba(179,139,77,0.2); padding-top:16px;">
+            <div><div style="font-size:0.65rem; color:var(--sub); margin-bottom:8px;">功法传承</div><div style="line-height:1.6; font-size:0.8rem;">${npcSkill}</div></div>
+            <div><div style="font-size:0.65rem; color:var(--sub); margin-bottom:8px;">本命神通</div><div style="line-height:1.6; font-size:0.8rem;">${npcAbility}</div></div>
+        </div>
+        <div style="margin-top:16px; font-size:0.8rem; color:var(--ink); line-height:1.6;">
+            <span style="color:var(--gold);">外貌：</span>${val(n,'外貌')} <br>
+            <span style="color:var(--gold);">衣着：</span>${val(n,'衣着')}
+        </div>
+    </div>
+
+    <div style="padding: 16px 24px;">
+        ${bar('好感', val(n,'好感度'), 100, 'var(--vermilion)')}
+        ${bar('顺从', val(n,'顺从度'), 100, 'var(--cyan)')}
+        ${bar('堕落', val(n,'堕落值'), 100, 'var(--ink-main)')}
+
+        <div class="yy-box">
+            <div class="yy-title">阴阳鼎炉录</div>
+            
+            <div class="yy-grid">
+                <div class="yy-plate">
+                    <div class="yy-plate-lbl">元阴状态</div>
+                    <div class="yy-plate-val" style="color:${String(val(n,'元阴')).includes('锁')?'var(--gold)':'var(--vermilion)'};">${val(n,'元阴')}</div>
+                </div>
+                <div class="yy-plate">
+                    <div class="yy-plate-lbl">合欢次数</div>
+                    <div class="yy-plate-val" style="color:var(--ink-main); font-family:monospace;">${val(n,'合欢数')}</div>
+                </div>
+            </div>
+
+            <div class="yy-preg">
+                <div class="yy-preg-lbl">造化孕育</div>
+                <div class="yy-preg-val">${val(preg,'状态')} <span style="font-size:0.65rem; color:var(--sub); font-weight:normal;">(${val(preg,'进度')}%)</span></div>
+            </div>
+
+            <div class="yy-2col">
+                <div>
+                    <div class="yy-sub-title">执念与偏好</div>
+                    <div>${xpTags || '<span style="color:var(--sub); font-size:0.65rem;">清心寡欲</span>'}</div>
+                </div>
+                <div>
+                    <div class="yy-sub-title">灵韵敏感点</div>
+                    ${sensHtml || '<div style="color:var(--sub); font-size:0.65rem;">未知</div>'}
+                </div>
+            </div>
+
+            <div class="yy-sub-title" style="color:var(--gold); border-bottom-color:rgba(179,139,77,0.2); margin-top:10px;">肉身隐秘</div>
+            <div class="yy-body-box">
+                ${bodyHtml}
+            </div>
+        </div>
+    </div>
+    `;
+    
+   // 计算境界层级，给弹窗覆写专属底色与华丽边缘光效
+    const tier = getRealmTier(val(n, '境界'));
+    const bannerDecor = getTierDecor(tier, nameColor);
+    
+    const mCardDom = document.querySelector('.m-card');
+    mCardDom.className = `m-card tier-modal tier-${tier}`;
+
+    // 在卷首大横幅处铺满天道纹理
+    const enhancedHtml = `<div style="position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:1;">${bannerDecor}</div>` + html;
+
+    // 1. 隐藏状态下注入内容，并重置滚动条位置
+    document.getElementById('m-title').innerText = `天机命谱 · ${val(n, '境界')}`;
+    document.getElementById('m-title').style.color = nameColor;
+    
+    const mContent = document.getElementById('m-content');
+    mContent.innerHTML = enhancedHtml;
+    mContent.scrollTop = 0; // 修复点开新 NPC 时停留在上次滚动位置的 Bug
+    
+    // 动态绑定抹除按钮的事件与颜色
+    const delBtn = document.getElementById('m-delete-btn');
+    if(delBtn) delBtn.onclick = () => deleteNPC(idx);
+
+    // 2. 核心修复：给浏览器 30ms 的时间完成复杂的 DOM 重绘，再执行弹出动画
+    setTimeout(() => {
+        document.getElementById('modal').classList.add('show');
+    }, 30);
+};
+window.closeModal = () => {
+    const modal = document.getElementById('modal');
+    const mCard = document.getElementById('m-card');
+    modal.classList.remove('show');
+    mCard.style.transform = ''; // 恢复拖拽产生的形变
+    
+    // 等待动画结束，销毁 DOM
+    setTimeout(() => {
+        if (!modal.classList.contains('show')) {
+            document.getElementById('m-content').innerHTML = '';
+        }
+    }, 400); 
+};
+
+// ===============================================
+// [升级版] 擒龙手：原生级下拉关闭手势引擎 (无缝衔接内部滚动)
+// ===============================================
+const mCardDom = document.getElementById('m-card');
+let dragStartY = 0, dragCurrentY = 0, isDraggingCard = false;
+
+mCardDom.addEventListener('touchstart', (e) => {
+    dragStartY = e.touches[0].clientY;
+    isDraggingCard = false;
+    mCardDom.style.transition = 'none'; // 剥离延迟，准备跟手
+}, { passive: true });
+
+mCardDom.addEventListener('touchmove', (e) => {
+    const mBodyDom = document.getElementById('m-content');
+    const currentY = e.touches[0].clientY;
+    
+    // 判断内容是否已经触顶
+    if (mBodyDom && mBodyDom.scrollTop <= 0) {
+        
+        // 核心法门：如果刚触顶，且手指向下划，立刻将当前坐标重置为锚点，实现“无缝衔接”
+        if (!isDraggingCard && currentY > dragStartY) {
+            isDraggingCard = true;
+            dragStartY = currentY; // 重置起点，防止画面闪烁跳变
+        }
+        
+        // 已经进入外层拖拽状态
+        if (isDraggingCard) {
+            const delta = currentY - dragStartY;
+            if (delta > 0) {
+                // 阻断内部滚动条的默认行为，强制接管为外部容器的位移
+                if (e.cancelable) e.preventDefault(); 
+                
+                dragCurrentY = delta;
+                mCardDom.style.transform = `translateY(${delta}px)`;
+            }
+        }
+    } else {
+        // 如果没触顶，或者是往上划，就把控制权还给内部滚动条
+        isDraggingCard = false; 
+        dragStartY = currentY; // 不断更新坐标，随时准备检测下一次触顶
+    }
+}, { passive: false }); // 必须设为 false，否则 e.preventDefault() 无法生效
+
+mCardDom.addEventListener('touchend', () => {
+    if (!isDraggingCard) return;
+    isDraggingCard = false;
+    
+    // 恢复 CSS 的过渡动画法则
+    mCardDom.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease'; 
+    
+    if (dragCurrentY > 120) { 
+        // 下拉距离超过 120px 阈值，判定为关闭意图
+        closeModal();
+    } else { 
+        // 未达阈值，Q弹复位
+        mCardDom.style.transform = '';
+    }
+    dragCurrentY = 0;
+});
+// ===============================================
+// 4. 初始化
+// ===============================================
+const init = async () => {
+    // --- 性能升级：全局事件委托中心 ---
+    const viewDom = document.getElementById('view');
+    if (viewDom && !window._hasBindClick) {
+        viewDom.addEventListener('click', (e) => {
+            // 统一接管 NPC 卡片的点击事件
+            const npcCard = e.target.closest('.npc-clickable');
+            if (npcCard) {
+                const idx = npcCard.getAttribute('data-idx');
+                if (idx !== null) openModal(parseInt(idx));
+            }
+            
+            // 在此也可以统一接管折叠面板的音频/动效等
+        });
+        window._hasBindClick = true;
+    }
+
+    try {
+        let d = {};
+        if (typeof getChatMessages === 'function') {
+            const msgs = await getChatMessages(getCurrentMessageId());
+            d = msgs?.[0]?.data?.stat_data || {};
+        } else if (window.lastData) {
+            d = window.lastData;
+        }
+        lastData = d;
+        UI.header(d);
+        Tab('status'); 
+        
+        if (typeof waitGlobalInitialized === 'function') {
+            waitGlobalInitialized('Mvu').then(() => {
+                if (typeof Mvu !== 'undefined') {
+                    eventOn(Mvu.events.VARIABLE_UPDATE_ENDED, m => {
+                        if (m?.stat_data) {
+                            lastData = m.stat_data;
+                            UI.header(lastData);
+                            const active = document.querySelector('.nav-btn.active');
+                            const key = active ? active.getAttribute('onclick').match(/'(.*)'/)[1] : 'status';
+                            
+                            // 天道法则三：后台数据更迭，启用无感刷新引擎
+                            // 玩家主动点击按钮依然走 Tab(key) 欣赏水墨转场
+                            SilentUpdate(key);
+                        }
+                    });
+                }
+            });
+        }
+    } catch (e) { console.error(e); }
+};
+
+if (typeof waitGlobalInitialized === 'function') waitGlobalInitialized('Mvu').then(init);
+else setTimeout(init, 100);
+
+})();
+</script>
+</body>
+</html>
